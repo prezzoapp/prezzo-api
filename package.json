@@ -1,0 +1,16 @@
+{
+  "name": "prezzo-api",
+  "version": "1.0.0",
+  "description": "Official Prezzo.io API",
+  "main": "node_modules/alfred/app.js",
+  "scripts": {
+    "dev": "alfred"
+  },
+  "repository": "git@github.com:odotan/prezzo-api.git",
+  "author": "ishmaelthedestroyer",
+  "license": "n/a",
+  "private": true,
+  "dependencies": {
+    "alfred": "git://github.com/ishmaelthedestroyer/alfred#alfred"
+  }
+}
