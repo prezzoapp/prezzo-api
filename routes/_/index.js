@@ -13,6 +13,6 @@ module.exports = {
   path: '/',
   method: 'GET',
   run(req: $Request, res: $Response) {
-    res.$end('Hello, World');
+    res.$end('Hello, World!!');
   }
 };

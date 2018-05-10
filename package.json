@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "alfred",
     "clean": "rm -rf build && mkdir build",
-    "build-babel": "babel -d ./build ./routes -s",
+    "build-babel": "babel -d ./build ./ -s --ignore node_modules",
     "build": "npm run clean && npm run build-babel",
     "start": "npm run build && cd build && alfred"
   },
