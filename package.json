@@ -4,7 +4,11 @@
   "description": "Official Prezzo.io API",
   "main": "node_modules/alfred/app.js",
   "scripts": {
-    "dev": "alfred"
+    "dev": "alfred",
+    "clean": "rm -rf build && mkdir build",
+    "build-babel": "babel -d ./build ./routes -s",
+    "build": "npm run clean && npm run build-babel",
+    "start": "npm run build && cd build && alfred"
   },
   "repository": "git@github.com:odotan/prezzo-api.git",
   "author": "ishmaelthedestroyer",

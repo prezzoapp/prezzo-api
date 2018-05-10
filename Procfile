@@ -1,1 +1,1 @@
-web: alfred
+web: npm run start
