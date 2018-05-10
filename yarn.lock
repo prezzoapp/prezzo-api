@@ -178,8 +178,9 @@ ajv@^6.0.1:
     json-schema-traverse "^0.3.0"
     uri-js "^4.2.1"
 
-"alfred@file:../../../nodejs/alfred":
+"alfred@git://github.com/ishmaelthedestroyer/alfred#alfred":
   version "1.0.0"
+  resolved "git://github.com/ishmaelthedestroyer/alfred#4107487cd874e5225fde36a72f6f60b94dd91479"
   dependencies:
     apn "^1.7.4"
     aws-sdk "^2.1.44"
