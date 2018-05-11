@@ -15,8 +15,9 @@
   "license": "n/a",
   "private": true,
   "dependencies": {
-    "alfred": "git://github.com/ishmaelthedestroyer/alfred#alfred",
-    "flow-typed": "^2.4.0"
+    "alfred": "file:../../../nodejs/alfred",
+    "flow-typed": "^2.4.0",
+    "mongoose": "^5.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
