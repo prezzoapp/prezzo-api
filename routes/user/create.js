@@ -45,6 +45,10 @@ module.exports = {
       }
     }
   },
+  transform(req) {
+    const { firstName, lastName } = req.body;
+    req.body.fullName = `${firstName.toLowerCase()} ${lastName.toLowerCase()}`;
+  },
   async run(req: $Request, res: $Response) {
     const user = await createUser(req.body);
     res.$end(user);
