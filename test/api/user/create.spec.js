@@ -40,5 +40,15 @@ module.exports = [
         $ne: '{{ payload.password }}'
       }
     }
+  },
+  {
+    description: 'should be able to login if session type sent',
+    path: '/v1/users?login=ios',
+    method: 'POST',
+    $$send: getPayload,
+    expectStatus: 200,
+    $$expectKeyValue: {
+      'sessions[0].type': 'ios'
+    }
   }
 ];
