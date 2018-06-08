@@ -1,9 +1,9 @@
 // @flow
 import type { $Request, $Response } from 'express';
-import { isValidEmail } from 'alfred/services/util';
 import { ServerError } from 'alfred/core/errors';
 import log from 'alfred/services/logger';
-import { findUserByEmail } from '../../models/user';
+import { validateToken } from 'alfred/services/facebook';
+import { findUserByFacebookId } from '../../models/user';
 
 module.exports = {
   description: 'Used to login to a user account.',
@@ -12,14 +12,12 @@ module.exports = {
   authorize: false,
   config: {
     body: {
-      email: {
+      facebookId: {
         type: 'string',
         required: true,
-        lowercase: true,
-        trim: true,
-        validate: isValidEmail
+        trim: true
       },
-      password: {
+      facebookToken: {
         type: 'string',
         required: true,
         trim: true
@@ -34,12 +32,17 @@ module.exports = {
       }
     }
   },
-  validate(req) {
-    return findUserByEmail(req.body.email).then(user => {
-      if (!req.data) req.data = {};
-      req.data.user = user;
-    });
-  },
+  validate: [
+    req => findUserByFacebookId(req.body.facebookId).then(user => {
+        if (!req.data) req.data = {};
+        req.data.user = user;
+      }),
+    req =>
+      validateToken(req.body.facebookId, req.body.facebookToken).then(user => {
+        if (!req.data) req.data = {};
+        req.data.user = user;
+      })
+  ],
   async run(req: $Request, res: $Response) {
     try {
       const { type, pushToken } = req.body;

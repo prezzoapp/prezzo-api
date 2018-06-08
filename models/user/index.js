@@ -10,8 +10,7 @@ export default User;
 export const createUser = async (params: any = {}) => new User(params).save();
 
 export const findUserByEmail = (email: string) => {
-  const deferred = $q.defer();
-  const { promise, resolve, reject } = deferred;
+  const { promise, resolve, reject } = $q.defer();
 
   User.findOne({ email }, (err, user) => {
     if (err) {
@@ -19,6 +18,24 @@ export const findUserByEmail = (email: string) => {
     } else if (!user) {
       return reject(
         new ResourceNotFoundError('No user exists with that email.')
+      );
+    }
+
+    return resolve(user);
+  });
+
+  return promise;
+};
+
+export const findUserByFacebookId = (facebookId: string) => {
+  const { promise, resolve, reject } = $q.defer();
+
+  User.findOne({ facebookId }, (err, user) => {
+    if (err) {
+      return reject(new ServerError(err));
+    } else if (!user) {
+      return reject(
+        new ResourceNotFoundError('No user exists with that facebook account.')
       );
     }
 
