@@ -353,6 +353,10 @@ module.exports = grunt => {
       );
     }
 
+    if (argv.proxy) {
+      grunt.config(`ctrllr.${testType}.options.proxy`, argv.proxy);
+    }
+
     grunt.task.run(`ctrllr:${testType}`);
   });
 

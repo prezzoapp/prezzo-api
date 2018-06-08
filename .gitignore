@@ -4,6 +4,7 @@ config/*/*
 config/*/*/*
 ~secure/**
 !~secure/.gitkeep
+.ignore
 
 # Created by https://www.gitignore.io
 
