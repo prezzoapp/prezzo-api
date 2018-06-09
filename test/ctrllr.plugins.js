@@ -34,14 +34,16 @@ var
 Initialization logic
  ========================================================================== */
 
-configLoader.init().then(function() {
-  worker = require(baseDir + '/services/worker');
+const initialize = async () => {
+ await configLoader.init();
 
-  models = {};
-  util.loadDirectorySync(baseDir + '/models').forEach(function(modelName) {
-    models[modelName] = require(baseDir + '/models/' + modelName);
-  });
-});
+ models = {};
+ util.loadDirectorySync(baseDir + '/models').forEach(function(modelName) {
+   models[modelName] = require(baseDir + '/models/' + modelName).default;
+ });
+};
+
+initialize();
 
 /* ==========================================================================
  These are the ctrllr plugins that will be used in the tests.
