@@ -3,7 +3,8 @@
  * @module Gruntfile
  */
 
-import 'babel-polyfill';
+require('babel-core/register');
+require('babel-polyfill');
 
 const ctrllrConfig = require('./test/ctrllr.config');
 const loadGruntTasks = require('load-grunt-tasks');
@@ -170,10 +171,10 @@ module.exports = grunt => {
         command: 'node tests/testCleanup --environment=test'
       },
       documentAPI: {
-        command: 'node core/scripts/documentAPI'
+        command: 'node node_modules/alfred/core/scripts/documentAPI'
       },
       documentModels: {
-        command: 'node core/scripts/documentModels'
+        command: 'node node_modules/alfred/core/scripts/documentModels'
       },
       gitAddAll: {
         command: 'git add -A'
@@ -362,16 +363,20 @@ module.exports = grunt => {
 
   // parses command, documents the server or just the models or api
   grunt.registerTask('doc', 'Documents the server', () => {
-    const args = Array.prototype.slice.call(arguments);
+    const { argv } = require('optimist');
+    const split = argv._[0].split(':');
+    split.shift();
 
-    if (!args.length) {
+    const type = split[0];
+
+    if (!type) {
       // document everything
       grunt.task.run('shell:documentAPI');
       grunt.task.run('shell:documentModels');
       return;
     }
 
-    switch (args[0]) {
+    switch (type) {
       case 'api':
         grunt.task.run('shell:documentAPI');
         break;

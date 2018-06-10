@@ -1,6 +1,15 @@
 {
-  "presets": ["env", "flow"],
+  "presets": [
+    "env",
+    "flow"
+  ],
   "plugins": [
+    [
+      "transform-runtime", {
+        "polyfill": false,
+        "regenerator": true
+      }
+    ],
     "transform-strict-mode",
     "transform-es2015-modules-commonjs",
     "transform-es2015-spread",
