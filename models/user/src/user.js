@@ -1,7 +1,7 @@
 // @flow
 import mongoose from 'mongoose';
 
-const Session = require('../../../models/session').schema;
+import Session from '../../../models/session';
 
 const User = new mongoose.Schema({
   createdDate: {
@@ -44,7 +44,7 @@ const User = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  sessions: [Session]
+  sessions: [Session.schema]
 });
 
 module.exports = User;
