@@ -2,6 +2,11 @@
 -  Date  
 -  defaults to `current time`  
   
+**creator**  
+-  ObjectID  
+- *REQUIRED*  
+-  reference to `User`  
+  
 **name**  
 -  String  
   
