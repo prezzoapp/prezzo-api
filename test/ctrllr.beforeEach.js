@@ -26,7 +26,7 @@ var
   mongoose = require('mongoose'),
 
   /** mongoose models */
-  User;
+  User, Resource, File;
 
 /* ==========================================================================
  Initialization logic
@@ -35,6 +35,8 @@ var
 const initialize = async () => {
   await configLoader.init();
   User = require(baseDir + '/models/user').default;
+  Resource = require(baseDir + '/models/resource').default;
+  File = require(baseDir + '/models/file').default;
 };
 
 initialize();
@@ -69,6 +71,37 @@ function createUser() {
     ],
     avatarURL: `http://${bucket}.s3.amazonaws.com/assets/test/text-icon.png`
   });
+}
+
+/**
+ * creates a generic Resource
+ * @returns {Resource}
+ */
+function createResourceWithJPG() {
+  const fileName = `${configLoader.get('NODE_ENV')}/${util.uuid()}.jpg`;
+
+  return new Resource({
+    name: util.random(10),
+    description: 'userAvatar',
+    files: [
+      new File({
+        key: fileName,
+        size: 3017,
+        mime: 'image/jpeg',
+        acl: 'public-read',
+        status: 'ready',
+        type: 'original'
+      })
+    ]
+  });
+}
+
+/**
+ * creates a generic Resource
+ * @returns {Resource}
+ */
+function createResource() {
+  return createResourceWithJPG();
 }
 
 /* ==========================================================================
@@ -175,5 +208,125 @@ module.exports = [
     });
 
     return deferred.promise;
+  },
+
+  // create `resource-0`, set `user-0` as creator
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const resource = createResource();
+
+    resource.creator = user._id;
+    resource.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `resource-0` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('resource-0', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `resource-1`, set `user-0` as creator
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const resource = createResource();
+
+    resource.creator = user._id;
+    resource.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `resource-1` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('resource-1', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `resource-2`, set `user-0` as creator
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const resource = createResource();
+
+    resource.creator = user._id;
+    resource.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `resource-2` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('resource-2', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `resource-3`, set `user-1` as creator
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const resource = createResource();
+
+    resource.creator = user._id;
+    resource.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `resource-3` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('resource-3', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `resource-4`, set `user-1` as creator
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const resource = createResource();
+
+    resource.creator = user._id;
+    resource.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `resource-4` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('resource-4', doc);
+      return resolve(doc);
+    });
+
+    return promise;
   }
 ];

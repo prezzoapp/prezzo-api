@@ -4,6 +4,7 @@
 
 import $q from 'q';
 import User from '../models/user';
+import Resource from '../models/resource';
 
 /* ==========================================================================
  Helper functions
@@ -15,12 +16,6 @@ import User from '../models/user';
  Export
  ========================================================================== */
 
-// ...
-
- /* ==========================================================================
-  Export
-  ========================================================================== */
-
 module.exports = [
   /**
    * clear all users from database
@@ -29,10 +24,25 @@ module.exports = [
    * @returns {*}
    */
   () => {
-    // const User = require('../models/user').default;
     const deferred = $q.defer();
 
     User.remove(() => {
+      deferred.resolve('resolved!');
+    });
+
+    return deferred.promise;
+  },
+
+  /**
+   * clear all resources from database
+   * @param ctrllr {CTRLLR} CTRLLR instance
+   * @param response {Object} response object of request
+   * @returns {*}
+   */
+  () => {
+    const deferred = $q.defer();
+
+    Resource.remove(() => {
       deferred.resolve('resolved!');
     });
 

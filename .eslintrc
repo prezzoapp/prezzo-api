@@ -28,7 +28,7 @@
     "class-methods-use-this": 0,
     "no-unused-expressions": ["error", { "allowTaggedTemplates": true }],
     "no-underscore-dangle": [
-      "error",
+      "warn",
       {
         "allow": ["__REDUX_DEVTOOLS_EXTENSION_COMPOSE__", "_allPostsMeta"]
       }

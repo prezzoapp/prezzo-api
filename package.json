@@ -7,7 +7,7 @@
     "dev": "alfred --PORT 5000",
     "clean": "rm -rf build && mkdir build",
     "build-babel": "./node_modules/.bin/babel -d ./build ./ -s --ignore node_modules",
-    "build": "npm run clean && npm run build-babel && cp -R config build/config && cp -R node_modules build/node_modules",
+    "build": "npm run clean && npm run build-babel && cp -R config build/config && cp -R bin build/bin && cp -R node_modules build/node_modules",
     "start": "npm run build && cd build && alfred production",
     "grunt": "npm run build && cd build && grunt",
     "doc": "npm run build && cd build && grunt doc",
