@@ -186,7 +186,7 @@ ajv@^6.0.1:
 
 "alfred@git://github.com/ishmaelthedestroyer/alfred#alfred":
   version "1.0.0"
-  resolved "git://github.com/ishmaelthedestroyer/alfred#29afb398446b8523bf5fc5cfa7ba612da355d5aa"
+  resolved "git://github.com/ishmaelthedestroyer/alfred#1fae076470692f63f800ebf1b8f9bdcd866f6516"
   dependencies:
     apn "^1.7.4"
     aws-sdk "^2.1.44"
