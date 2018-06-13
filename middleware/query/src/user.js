@@ -1,6 +1,6 @@
 // @flow
 import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
-import log from 'alfred/services/logger';
+import { isObjectId } from 'alfred/services/util';
 import User from '../../../models/user';
 
 module.exports = {
@@ -9,9 +9,11 @@ module.exports = {
   priority: 2,
   match: '/v1/users/:id/',
   run(req, res, next) {
-    log.debug('hit user query middleware');
+    const query = isObjectId(req.params.id)
+      ? { _id: req.params.id }
+      : { facebookId: req.params.id };
 
-    User.findById(req.params.id, (err, user) => {
+    User.findOne(query, (err, user) => {
       if (err) {
         return res.$fail(new ServerError(err));
       } else if (!user) {

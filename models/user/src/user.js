@@ -21,6 +21,14 @@ const User = new mongoose.Schema({
     trim: true,
     required: true
   },
+  facebookId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  facebookToken: {
+    type: String
+  },
   firstName: {
     type: String,
     required: true,

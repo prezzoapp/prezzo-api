@@ -140,6 +140,9 @@ module.exports = [
     const store = ctrllr.getStore();
     const user = createUser();
 
+    user.facebookId = '4';
+    user.facebookToken = util.random(20);
+
     user.save((err, doc) => {
       if (err) {
         console.error('Error creating `user-1` in `ctrllr.beforeEach`!', err);
