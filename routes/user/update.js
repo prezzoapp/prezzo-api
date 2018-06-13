@@ -1,7 +1,8 @@
 // @flow
 import type { $Request, $Response } from 'express';
-import { ServerError } from 'alfred/core/errors';
+import { ServerError, ForbiddenError } from 'alfred/core/errors';
 import log from 'alfred/services/logger';
+import { deferReject, getValueForURLParam } from 'alfred/services/util';
 import { findAndUpdateUser } from '../../models/user';
 
 module.exports = {
@@ -43,9 +44,16 @@ module.exports = {
       }
     }
   },
+  validate(req) {
+    const path = '/v1/users/:id';
+    const userId = getValueForURLParam(path, req.path, ':id');
+    if (userId !== req.user._id.toString()) {
+      return deferReject(new ForbiddenError());
+    }
+  },
   transform(req) {
-    const firstName = req.body.firstName || req.data.user.firstName;
-    const lastName = req.body.lastName || req.data.user.lastName;
+    const firstName = req.body.firstName || req.user.firstName;
+    const lastName = req.body.lastName || req.user.lastName;
 
     req.body.fullName = `${firstName.toLowerCase()} ${lastName.toLowerCase()}`;
   },

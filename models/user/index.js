@@ -45,4 +45,20 @@ export const findUserByFacebookId = (facebookId: string) => {
   return promise;
 };
 
+export const findAndUpdateUser = (query: any = {}, update: any = {}) => {
+  const { promise, resolve, reject } = $q.defer();
+
+  User.findOneAndUpdate(query, update, { new: true }, (err, user) => {
+    if (err) {
+      return reject(new ServerError(err));
+    } else if (!user) {
+      return reject(new ResourceNotFoundError('That user doesnt exist.'));
+    }
+
+    return resolve(user);
+  });
+
+  return promise;
+};
+
 export const listUsers = (query: any = {}) => User.find(query);

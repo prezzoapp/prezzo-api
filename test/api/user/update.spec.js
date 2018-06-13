@@ -32,7 +32,7 @@ module.exports = [
       'should return status 404 (resource not found) if the user doesnt exist',
     $$url: '/v1/users/{{ randomObjectId }}',
     method: 'POST',
-    $$auth: 'user-0',
+    $$basicAuth: 'user-0',
     $$send: getPayload,
     expectStatus: 404
   },
@@ -41,15 +41,15 @@ module.exports = [
       'should return status 403 (forbidden) if a user tries to update another users account',
     $$url: '/v1/users/{{ user-1._id }}',
     method: 'POST',
-    $$auth: 'user-0',
+    $$basicAuth: 'user-0',
     $$send: getPayload,
-    expectStatus: 200
+    expectStatus: 403
   },
   {
     description: 'should succeed on a valid request',
-    $$url: '/v1/users/{{ user-1._id }}',
+    $$url: '/v1/users/{{ user-0._id }}',
     method: 'POST',
-    $$auth: 'user-0',
+    $$basicAuth: 'user-0',
     $$send: getPayload,
     expectStatus: 200,
     $$expectKeyValue: {
@@ -64,33 +64,21 @@ module.exports = [
   },
   {
     description: 'should update the users full name',
-    $$url: '/v1/users/{{ user-1._id }}',
+    $$url: '/v1/users/{{ user-0._id }}',
     method: 'POST',
-    $$auth: 'user-0',
+    $$basicAuth: 'user-0',
     $$send: getPayload,
     expectStatus: 200,
     $$expectKeyValue: {
-      firstName:
-        '<%"{{ payload.firstName }} {{ payload.lastName }}".toLowerCase()%>'
-    }
-  },
-  {
-    description: 'should update the users full name',
-    $$url: '/v1/users/{{ user-1._id }}',
-    method: 'POST',
-    $$auth: 'user-0',
-    $$send: getPayload,
-    expectStatus: 200,
-    $$expectKeyValue: {
-      firstName:
+      fullName:
         '<%"{{ payload.firstName }} {{ payload.lastName }}".toLowerCase()%>'
     }
   },
   {
     description: 'should NOT update the users email',
-    $$url: '/v1/users/{{ user-1._id }}',
+    $$url: '/v1/users/{{ user-0._id }}',
     method: 'POST',
-    $$auth: 'user-0',
+    $$basicAuth: 'user-0',
     $$send: {
       email: `${random(10)}@gmail.com`
     },
