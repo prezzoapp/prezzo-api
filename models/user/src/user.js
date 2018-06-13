@@ -40,6 +40,18 @@ const User = new mongoose.Schema({
   avatarURL: {
     type: String
   },
+  phone: {
+    type: String
+  },
+  address: {
+    type: String
+  },
+  zip: {
+    type: String
+  },
+  city: {
+    type: String
+  },
   isSubscribedToPromotions: {
     type: Boolean,
     default: true

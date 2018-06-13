@@ -9,6 +9,7 @@ module.exports = {
   description: 'Creates a user.',
   path: '/v1/users',
   method: 'POST',
+  authorize: false,
   config: {
     body: {
       email: {

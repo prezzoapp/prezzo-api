@@ -7,7 +7,7 @@ import { findUserByFacebookId } from '../../models/user';
 
 module.exports = {
   description: 'Used to login to a user account.',
-  path: '/v1/auth/login',
+  path: '/v1/auth/facebook',
   method: 'POST',
   authorize: false,
   config: {
