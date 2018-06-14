@@ -1,10 +1,10 @@
 // @flow
 module.exports = [
   {
-    description: 'should require authorization',
+    description: 'should NOT require authorization',
     $$url: '/v1/users/{{ user-0._id }}',
     method: 'GET',
-    expectStatus: 401
+    expectStatus: 200
   },
   {
     description: 'should return back the specified user',

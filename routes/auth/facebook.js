@@ -37,11 +37,7 @@ module.exports = {
         if (!req.data) req.data = {};
         req.data.user = user;
       }),
-    req =>
-      validateToken(req.body.facebookId, req.body.facebookToken).then(user => {
-        if (!req.data) req.data = {};
-        req.data.user = user;
-      })
+    req => validateToken(req.body.facebookId, req.body.facebookToken)
   ],
   async run(req: $Request, res: $Response) {
     try {
