@@ -10,6 +10,12 @@
 -  String  
 - *REQUIRED*  
   
+**facebookId**  
+-  String  
+  
+**facebookToken**  
+-  String  
+  
 **firstName**  
 -  String  
 - *REQUIRED*  
@@ -23,6 +29,18 @@
 - *REQUIRED*  
   
 **avatarURL**  
+-  String  
+  
+**phone**  
+-  String  
+  
+**address**  
+-  String  
+  
+**zip**  
+-  String  
+  
+**city**  
 -  String  
   
 **isSubscribedToPromotions**  

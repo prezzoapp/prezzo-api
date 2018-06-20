@@ -1,7 +1,7 @@
 Used to login to a user account.  
   
 *method:* `POST`  
-*path:* `/v1/auth/login`  
+*path:* `/v1/auth/facebook`  
   
 Parameters  
 -----------  

@@ -12,7 +12,8 @@
     "grunt": "npm run build && cd build && grunt",
     "doc": "npm run build && cd build && grunt doc",
     "doc:api": "npm run build && cd build && grunt doc:api",
-    "doc:models": "npm run build && cd build && grunt doc:models"
+    "doc:models": "npm run build && cd build && grunt doc:models",
+    "postinstall": "patch-package"
   },
   "repository": "git@github.com:odotan/prezzo-api.git",
   "author": "ishmaelthedestroyer",
@@ -21,6 +22,8 @@
   "dependencies": {
     "alfred": "git://github.com/ishmaelthedestroyer/alfred#alfred",
     "babel-plugin-transform-runtime": "^6.23.0",
+    "cities": "^1.1.2",
+    "geocoder": "^0.2.3",
     "mongoose": "^5.1.0",
     "q": "^1.5.1"
   },
@@ -51,6 +54,8 @@
     "grunt-todos": "^0.3.0",
     "lint-staged": "^7.1.0",
     "load-grunt-tasks": "^3.1.0",
+    "patch-package": "^5.1.1",
+    "postinstall-postinstall": "^1.0.0",
     "prettier": "^1.12.1"
   }
 }

@@ -26,7 +26,7 @@ var
   mongoose = require('mongoose'),
 
   /** mongoose models */
-  User, Resource, File;
+  User, Resource, File, Location;
 
 /* ==========================================================================
  Initialization logic
@@ -37,6 +37,7 @@ const initialize = async () => {
   User = require(baseDir + '/models/user').default;
   Resource = require(baseDir + '/models/resource').default;
   File = require(baseDir + '/models/file').default;
+  Location = require(baseDir + '/models/location').default;
 };
 
 initialize();
@@ -102,6 +103,106 @@ function createResourceWithJPG() {
  */
 function createResource() {
   return createResourceWithJPG();
+}
+
+/**
+ * creates a generic location
+ * @return {Location}
+ */
+function createLocation() {
+  return new Location({
+    address: '123 Main St',
+    city: 'Beverly Hills',
+    region: 'California',
+    regionShort: 'CA',
+    country: 'United States',
+    countryShort: 'US',
+    postalCode: '90210',
+    coordinates: [
+      -118.40612,
+      34.088808,
+    ],
+  });
+}
+
+/**
+ * creates a generic location
+ * @return {Location}
+ */
+function createLocation2() {
+  return new Location({
+    address: '123 Main St',
+    city: 'Omaha',
+    region: 'Nebraska',
+    regionShort: 'NE',
+    country: 'United States',
+    countryShort: 'US',
+    postalCode: '68111',
+    coordinates: [
+      -95.96434,
+      41.294547,
+    ],
+  });
+}
+
+/**
+ * creates a generic location
+ * @return {Location}
+ */
+function createLocation3() {
+  return new Location({
+    address: '123 Main St',
+    city: 'Venice',
+    region: 'California',
+    regionShort: 'CA',
+    country: 'United States',
+    countryShort: 'US',
+    postalCode: '90291',
+    coordinates: [
+      -118.46531,
+      33.992411,
+    ],
+  });
+}
+
+/**
+ * creates a generic location
+ * @return {Location}
+ */
+function createLocation4() {
+  return new Location({
+    address: '350 Hope Ave',
+    city: 'Salt Lake City',
+    region: 'Utah',
+    regionShort: 'UT',
+    country: 'United States',
+    countryShort: 'US',
+    postalCode: '84115',
+    coordinates: [
+      -111.9712219,
+      40.7407948,
+    ],
+  });
+}
+
+/**
+ * creates a generic location
+ * @return {Location}
+ */
+function createLocation5() {
+  return new Location({
+    address: '757 Westwood Plaza',
+    city: 'Los Angeles',
+    region: 'California',
+    regionShort: 'CA',
+    country: 'United States',
+    countryShort: 'US',
+    postalCode: '90095',
+    coordinates: [
+      -118.4473698,
+      34.068921,
+    ],
+  });
 }
 
 /* ==========================================================================
@@ -327,6 +428,138 @@ module.exports = [
       }
 
       store.set('resource-4', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `location-0`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const location = createLocation();
+
+    location.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `location-0` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('location-0', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `location-1`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const location = createLocation2();
+
+    location.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `location-1` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('location-1', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `location-2`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const location = createLocation3();
+
+    location.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `location-2` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('location-2', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `location-3`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const location = createLocation3();
+
+    location.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `location-3` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('location-3', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `location-4`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const location = createLocation4();
+
+    location.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `location-4` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('location-4', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `location-5`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const location = createLocation5();
+
+    location.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `location-5` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('location-5', doc);
       return resolve(doc);
     });
 
