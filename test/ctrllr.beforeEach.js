@@ -1,36 +1,18 @@
-/* ==========================================================================
- This script exports an array of functions to be called before each test
- ========================================================================== */
+// @flow
+import $q from 'q';
+import mongoose from 'mongoose';
+import log from 'alfred/services/logger';
+import { random, uuid, getNumberInRange } from 'alfred/services/util';
+import configLoader from 'alfred/services/configLoader';
+import categories from '../models/vendor/config/categories';
 
-var
-
-  /**
-   * app base directory
-   * @type {String}
-   */
-  baseDir = process.cwd(),
-
-  /** async flow lib */
-  $q = require('q'),
-
-  /** logging service */
-  log = require('alfred/services/logger'),
-
-  /** server utilities */
-  util = require('alfred/services/util'),
-
-  /** configuration manager */
-  configLoader = require('alfred/services/configLoader'),
-
-  /** mongo ORM */
-  mongoose = require('mongoose'),
-
-  /** mongoose models */
-  User, Resource, File, Location;
-
-/* ==========================================================================
- Initialization logic
- ========================================================================== */
+const baseDir = process.cwd();
+let User;
+let Resource;
+let File;
+let Location;
+let Vendor;
+let HoursOfOperation;
 
 const initialize = async () => {
   await configLoader.init();
@@ -38,21 +20,19 @@ const initialize = async () => {
   Resource = require(baseDir + '/models/resource').default;
   File = require(baseDir + '/models/file').default;
   Location = require(baseDir + '/models/location').default;
+  Vendor = require(baseDir + '/models/vendor').default;
+  HoursOfOperation = require(baseDir + '/models/hoursOfOperation').default;
 };
 
 initialize();
-
-/* ==========================================================================
- Helper Functions
- ========================================================================== */
 
 /**
  * creates a generic User
  * @returns {User}
  */
 function createUser() {
-  const firstName = util.random(10);
-  const lastName = util.random(10);
+  const firstName = random(10);
+  const lastName = random(10);
   const fullName = `${firstName} ${lastName}`;
   const bucket = configLoader.get('s3:S3_BUCKET');
 
@@ -60,7 +40,7 @@ function createUser() {
     firstName,
     lastName,
     fullName,
-    email: `${util.random(10)}@gmail.com`,
+    email: `${random(10)}@gmail.com`,
     password: 'password',
     sessions: [
       {
@@ -79,10 +59,10 @@ function createUser() {
  * @returns {Resource}
  */
 function createResourceWithJPG() {
-  const fileName = `${configLoader.get('NODE_ENV')}/${util.uuid()}.jpg`;
+  const fileName = `${configLoader.get('NODE_ENV')}/${uuid()}.jpg`;
 
   return new Resource({
-    name: util.random(10),
+    name: random(10),
     description: 'userAvatar',
     files: [
       new File({
@@ -198,16 +178,41 @@ function createLocation5() {
     country: 'United States',
     countryShort: 'US',
     postalCode: '90095',
-    coordinates: [
-      -118.4473698,
-      34.068921,
-    ],
+    coordinates: [-118.4473698, 34.068921]
   });
 }
 
-/* ==========================================================================
- Export
- ========================================================================== */
+/**
+ * creates a generic vendor
+ * @return {Vendor}
+ */
+function createVendor() {
+  return new Vendor({
+    name: random(10),
+    phone: random(10, false, true),
+    website: `https://${random(10)}.com/`,
+    categories: [categories[getNumberInRange(0, categories.length)]],
+    avatarURL: `https://${random(10)}.com/${random(10)}.jpg`,
+    location: createLocation(),
+    hours: [
+      new HoursOfOperation({
+        dayOfWeek: 1,
+        openTimeHour: 8,
+        openTimeMinutes: 0,
+        closeTimeHour: 10,
+        closeTimeMinutes: 0
+      }),
+      new HoursOfOperation({
+        dayOfWeek: 2,
+        openTimeHour: 8,
+        openTimeMinutes: 0,
+        closeTimeHour: 10,
+        closeTimeMinutes: 0
+      })
+    ],
+    status: 'pending'
+  });
+}
 
 module.exports = [
   // create random object id
@@ -242,7 +247,7 @@ module.exports = [
     const user = createUser();
 
     user.facebookId = '4';
-    user.facebookToken = util.random(20);
+    user.facebookToken = random(20);
 
     user.save((err, doc) => {
       if (err) {
@@ -560,6 +565,30 @@ module.exports = [
       }
 
       store.set('location-5', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `vendor-0`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const vendor = createVendor();
+
+    user.vendor = vendor;
+    user.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `user-0` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('user-0', doc);
       return resolve(doc);
     });
 

@@ -6,6 +6,7 @@ import $q from 'q';
 import User from '../models/user';
 import Resource from '../models/resource';
 import Location from '../models/location';
+import Vendor from '../models/vendor';
 
 /* ==========================================================================
  Helper functions
@@ -60,6 +61,22 @@ module.exports = [
     const deferred = $q.defer();
 
     Location.remove(() => {
+      deferred.resolve('resolved!');
+    });
+
+    return deferred.promise;
+  },
+
+  /**
+   * clear all vendors from database
+   * @param ctrllr {CTRLLR} CTRLLR instance
+   * @param response {Object} response object of request
+   * @returns {*}
+   */
+  () => {
+    const deferred = $q.defer();
+
+    Vendor.remove(() => {
       deferred.resolve('resolved!');
     });
 

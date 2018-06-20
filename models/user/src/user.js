@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 
 import Session from '../../../models/session';
+import Vendor from '../../../models/vendor';
 
 const User = new mongoose.Schema({
   createdDate: {
@@ -64,7 +65,8 @@ const User = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  sessions: [Session.schema]
+  sessions: [Session.schema],
+  vendor: Vendor.schema
 });
 
 module.exports = User;
