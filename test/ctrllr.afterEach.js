@@ -3,6 +3,7 @@
  ========================================================================== */
 
 import $q from 'q';
+import { debug } from 'alfred/services/logger';
 import User from '../models/user';
 import Resource from '../models/resource';
 import Location from '../models/location';
@@ -19,6 +20,16 @@ import Vendor from '../models/vendor';
  ========================================================================== */
 
 module.exports = [
+  (ctrllr, response) => {
+    if (response && response.status) {
+      debug('response.status', response.status);
+    }
+
+    if (response && response.body) {
+      debug('response.body', response.body);
+    }
+  },
+
   /**
    * clear all users from database
    * @param ctrllr {CTRLLR} CTRLLR instance

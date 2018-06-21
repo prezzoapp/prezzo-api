@@ -1,5 +1,5 @@
 // @flow
-import whitelistFields from '../config/populate.json';
+import whitelistFields from '../config/populate';
 
 module.exports = {
   name: 'toJSON',
