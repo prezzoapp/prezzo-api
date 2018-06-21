@@ -581,14 +581,32 @@ module.exports = [
     user.vendor = vendor;
     user.save((err, doc) => {
       if (err) {
-        console.error(
-          'Error creating `user-0` in `ctrllr.beforeEach`!',
-          err
-        );
+        console.error('Error creating `user-0` in `ctrllr.beforeEach`!', err);
         return reject(err);
       }
 
       store.set('user-0', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `vendor-1`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const vendor = createVendor();
+
+    user.vendor = vendor;
+    user.save((err, doc) => {
+      if (err) {
+        console.error('Error creating `user-0` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      }
+
+      store.set('user-1', doc);
       return resolve(doc);
     });
 

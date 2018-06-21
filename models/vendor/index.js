@@ -1,5 +1,6 @@
 // @flow
 import $q from 'q';
+import { extend } from 'alfred/services/util';
 import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
 import User from '../../models/user';
 
@@ -15,6 +16,32 @@ export const createVendor = (user, vendor) => {
     user._id,
     {
       vendor: new Vendor(vendor)
+    },
+    {
+      new: true
+    },
+    (err, updatedUser) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!updatedUser) {
+        return reject(new ResourceNotFoundError('Failed to find user.'));
+      }
+
+      return resolve(updatedUser);
+    }
+  );
+
+  return promise;
+};
+
+export const updateVendor = (user, vendor) => {
+  const { promise, resolve, reject } = $q.defer();
+  const updatedVendor = extend({}, user.vendor, vendor);
+
+  User.findByIdAndUpdate(
+    user._id,
+    {
+      vendor: new Vendor(updatedVendor)
     },
     {
       new: true
