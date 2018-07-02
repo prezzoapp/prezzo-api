@@ -37,11 +37,13 @@ export const createVendor = (user, vendor) => {
 export const updateVendor = (user, vendor) => {
   const { promise, resolve, reject } = $q.defer();
   const updatedVendor = extend({}, user.vendor, vendor);
+  const vendorToSave = new Vendor(updatedVendor);
+  vendorToSave._id = user.vendor._id;
 
   User.findByIdAndUpdate(
     user._id,
     {
-      vendor: new Vendor(updatedVendor)
+      vendor: vendorToSave
     },
     {
       new: true

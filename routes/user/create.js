@@ -59,18 +59,6 @@ module.exports = {
     req.body.fullName = `${firstName.toLowerCase()} ${lastName.toLowerCase()}`;
   },
   async run(req: $Request, res: $Response) {
-    // return res.$end({
-    //   isSubscribedToPromotions: true,
-    //   _id: '5b1619fcb1abbb24b011a035',
-    //   email: 'asdf@asdf.com',
-    //   firstName: 'Ishmael',
-    //   lastName: 'Samuel',
-    //   password: '$2b$10$jR8YLKbtilqEUrm6.x.XjulhnngItrZSQxJ5ILJCtbAZRn.p0f6ym',
-    //   fullName: 'ishmael samuel',
-    //   createdDate: '2018-06-05T05:05:00.604Z',
-    //   sessions: [],
-    //   __v: 0
-    // });
     try {
       const user = await createUser(req.body);
 
