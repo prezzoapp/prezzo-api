@@ -51,6 +51,9 @@
 -  Array  
 -  reference to `Session`  
   
+**vendor**  
+-  Embedded  
+  
 **_id**  
 -  ObjectID  
   
