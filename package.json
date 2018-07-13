@@ -9,7 +9,7 @@
     "build-babel": "./node_modules/.bin/babel --source-maps=inline -d ./build ./ -s --ignore node_modules",
     "build": "npm run clean && npm run build-babel && cp -R config build/config && cp -R bin build/bin && cp -R node_modules build/node_modules",
     "start": "npm run build && cd build && alfred production",
-    "grunt": "npm run build && cd build && grunt",
+    "test": "npm run build && cd build && NODE_ENV=test grunt",
     "doc": "npm run build && cd build && grunt doc",
     "doc:api": "npm run build && cd build && grunt doc:api",
     "doc:models": "npm run build && cd build && grunt doc:models",
@@ -23,8 +23,11 @@
     "alfred": "git://github.com/ishmaelthedestroyer/alfred#alfred",
     "babel-plugin-transform-runtime": "^6.23.0",
     "cities": "^1.1.2",
+    "crypto-js": "^3.1.9-1",
     "geocoder": "^0.2.3",
+    "https-proxy-agent": "^2.2.1",
     "mongoose": "^5.1.0",
+    "node-fetch": "^2.1.2",
     "q": "^1.5.1"
   },
   "devDependencies": {

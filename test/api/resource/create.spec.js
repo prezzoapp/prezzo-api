@@ -2,10 +2,27 @@
    internal & imported variables
    ========================================================================== */
 
+import { argv } from 'optimist';
+import enableProxy from '../../../scripts/enableProxy';
+const proxy = argv.proxy || null;
+
+if (proxy) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  process.env.HTTPS_PROXY = proxy;
+  process.env.HTTP_PROXY = proxy;
+  // enableProxy(proxy);
+}
+
 import $q from 'q';
 import fs from 'fs';
+import req from 'request';
+import FormData from 'form-data';
+import fetch from 'node-fetch';
+import HttpsProxyAgent from 'https-proxy-agent';
 import log from 'alfred/services/logger';
-import util from 'alfred/services/util';
+import configLoader from 'alfred/services/configLoader';
+
+log.info('got proxy', proxy);
 
 /* ==========================================================================
    Exports - test configuration
@@ -26,7 +43,7 @@ module.exports = [
     expectStatus: 400,
     $$send: {
       size: 1024,
-      type: 'userAvatar',
+      type: 'userAvatar'
     }
   },
   {
@@ -37,7 +54,7 @@ module.exports = [
     expectStatus: 400,
     $$send: {
       mime: 'image/jpeg',
-      type: 'userAvatar',
+      type: 'userAvatar'
     }
   },
   {
@@ -60,7 +77,7 @@ module.exports = [
     $$send: {
       size: 1024,
       mime: 'image/jpeg',
-      type: 'asdf',
+      type: 'asdf'
     }
   },
   {
@@ -72,7 +89,7 @@ module.exports = [
     $$send: {
       size: 1024,
       mime: 'image/jpeg',
-      type: 'userAvatar',
+      type: 'userAvatar'
     }
   },
   {
@@ -104,12 +121,12 @@ module.exports = [
       type: 'userAvatar',
       'files[0].size': 1024,
       'files[0].mime': 'image/jpeg',
-      'files[0].type': 'original',
+      'files[0].type': 'original'
     },
-    after: function(ctrllr, response) {
+    after: (ctrllr, response) => {
       console.log('response.status', response.status);
       console.log('response.body', response.body);
-    },
+    }
   },
   {
     description: 'should create a resource with a nested file object',
@@ -136,40 +153,38 @@ module.exports = [
     ]
   },
   {
-    description: 'should return a nested file with an `uploadUrl` that can be uploaded to',
+    description:
+      'should return a nested file with an `uploadUrl` that can be uploaded to',
     method: 'POST',
     url: '/v1/resources',
     $$basicAuth: 'user-0',
     $$send: {
-      size: 2323,
+      size: 2343,
       mime: 'image/jpeg',
-      type: 'userAvatar',
+      type: 'userAvatar'
     },
-    after: function(ctrllr, response) {
-      var
-        deferred = $q.defer(),
-        req = require('request'),
-        configLoader = require('alfred/services/configLoader'),
-        stats = fs.statSync(__dirname + '/../../../bin/text-icon.png'),
-        proxy = configLoader.get('proxy') || null,
-        payload = {
-          url: response.body.files[0].meta.uploadUrl,
-          headers: {
-            'Content-Type': 'image/jpeg',
-            'Content-Length': 2323
-          },
-          formData: {
-            file: fs.createReadStream(__dirname + '/../../../bin/text-icon.png')
-          },
-          // proxy: proxy
-        };
+    after(ctrllr, response) {
+      const deferred = $q.defer();
+      const stats = fs.statSync(__dirname + '/../../../bin/text-icon.png');
+      const payload = {
+        url: response.body.files[0].meta.uploadUrl,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Content-Length': stats.size
+        },
+        formData: {
+          file: fs.createReadStream(`${__dirname}/../../../bin/text-icon.png`)
+        }
+        // proxy: proxy
+      };
 
       // log.info('prepared proxy', proxy);
 
-      req.put(payload, function(err, httpResponse, body) {
-        ctrllr.assert('should have uploaded without errors', function() {
-          return err ? false : true;
-        });
+      req.put(payload, (err, httpResponse) => {
+        ctrllr.assert(
+          'should have uploaded without errors',
+          () => err ? false : true
+        );
 
         if (err) {
           log.warn('got error uploading to amazon', err, '');
@@ -178,9 +193,12 @@ module.exports = [
 
         log.debug('got amazon response', httpResponse, '');
 
-        ctrllr.assert('should return a proper status from amazon', function() {
-          return httpResponse.statusCode >= 200 && httpResponse.statusCode < 400;
-        }, 200, httpResponse.statusCode);
+        ctrllr.assert(
+          'should return a proper status from amazon',
+          () => httpResponse.statusCode >= 200 && httpResponse.statusCode < 400,
+          200,
+          httpResponse.statusCode
+        );
 
         return deferred.resolve(true);
       });
@@ -189,14 +207,15 @@ module.exports = [
     }
   },
   {
-    description: 'should provide an aws policy when specifying the `addPolicy` query parameter',
+    description:
+      'should provide an aws policy when specifying the `addPolicy` query parameter',
     method: 'POST',
     url: '/v1/resources?addPolicy=true',
     $$basicAuth: 'user-0',
     $$send: {
-      size: 2323,
+      size: 2343,
       mime: 'image/jpeg',
-      type: 'userAvatar',
+      type: 'userAvatar'
     },
     expectStatus: 200,
     expectKeys: [
@@ -211,26 +230,46 @@ module.exports = [
       'files[0].meta.policy',
       'files[0].meta.uploadUrl'
     ],
-    after: function(ctrllr, response) {
-      var
-        deferred = $q.defer(),
-        FormData = require('form-data'),
-        policy = response.body.files[0].meta.policy || {},
-        form = new FormData();
+    after(ctrllr, response) {
+      const deferred = $q.defer();
+      const form = new FormData();
+      const stats = fs.statSync(`${__dirname}/../../../bin/text-icon.png`);
+      const policy = response.body.files[0].meta.policy || {};
+      const uploadUrl = response.body.files[0].meta.uploadUrl;
 
-      for (var key in policy) {
+      for (let key in policy) {
         form.append(key, policy[key]);
       }
 
-      form.append('file', fs.createReadStream(__dirname + '/../../../bin/text-icon.png'));
-      form.submit(response.body.files[0].meta.uploadUrl, function(err, res) {
-        ctrllr.assert('should have uploaded without errors', !err);
-        ctrllr.assert('should return a proper status from amazon', function() {
-          return res.statusCode >= 200 && res.statusCode < 400;
-        }, 200, res.statusCode);
+      form.append(
+        'file',
+        fs.createReadStream(`${__dirname}/../../../bin/text-icon.png`)
+      );
 
-        deferred.resolve(true);
-      });
+      fetch(uploadUrl, {
+        method: 'POST',
+        body: form,
+        agent: proxy ? new HttpsProxyAgent(proxy) : null,
+        headers: {
+          'Content-Length': stats.size,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+        .then(res => {
+          ctrllr.assert(
+            'should return a proper status from amazon',
+            () => res && res.status && res.status >= 200 && res.status < 400,
+            200,
+            res.status
+          );
+
+          deferred.resolve(true);
+        })
+        .catch(err => {
+          log.error('error', err, '');
+          ctrllr.assert('should have executed without any errors', false);
+          return deferred.reject();
+        });
 
       return deferred.promise;
     }
@@ -238,48 +277,47 @@ module.exports = [
   {
     description: 'should allow specifying the acl as a query parameter',
     method: 'POST',
-    url: '/v1/resources?acl=' + encodeURIComponent('public-read'),
+    url: `/v1/resources?acl=${encodeURIComponent('public-read')}`,
     $$basicAuth: 'user-0',
     $$send: {
-      size: 2323,
-      mime: 'image/jpeg',
-      type: 'userAvatar',
+      size: 2343,
+      mime: 'image/png',
+      type: 'userAvatar'
     },
     expectStatus: 200,
     expectKeyValue: {
       'files[0].acl': 'public-read'
     },
-    tags: [
-      'resource.create'
-    ],
-    after: function(ctrllr, response) {
-      var
-        deferred = $q.defer(),
-        req = require('request'),
-        stats = fs.statSync(__dirname + '/../../../bin/text-icon.png'),
-        payload = {
-          url: response.body.files[0].meta.uploadUrl,
-          headers: {
-            'Content-Type': 'image/jpeg',
-            'Content-Length': 2323
-          },
-          formData: {
-            file: fs.createReadStream(__dirname + '/../../../bin/text-icon.png')
-          }
-        };
+    after(ctrllr, response) {
+      const deferred = $q.defer();
+      const stats = fs.statSync(`${__dirname}/../../../bin/text-icon.png`);
+      const payload = {
+        url: response.body.files[0].meta.uploadUrl,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Content-Length': stats.size
+        },
+        formData: {
+          file: fs.createReadStream(`${__dirname}/../../../bin/text-icon.png`)
+        }
+      };
 
-      req.put(payload, function(err, httpResponse, body) {
-        ctrllr.assert('should have uploaded without errors', function() {
-          return err ? false : true;
-        });
+      req.put(payload, (err, httpResponse) => {
+        ctrllr.assert(
+          'should have uploaded without errors',
+          () => err ? false : true
+        );
 
         if (err) {
           return deferred.reject(err);
         }
 
-        ctrllr.assert('should return a proper status from amazon', function() {
-          return httpResponse.statusCode >= 200 && httpResponse.statusCode < 400;
-        }, 200, httpResponse.statusCode);
+        ctrllr.assert(
+          'should return a proper status from amazon',
+          () => httpResponse.statusCode >= 200 && httpResponse.statusCode < 400,
+          200,
+          httpResponse.statusCode
+        );
 
         return deferred.resolve(true);
       });
@@ -295,7 +333,7 @@ module.exports = [
     $$send: {
       size: 2131,
       mime: 'application/zip',
-      type: 'userAvatar',
+      type: 'userAvatar'
     },
     expectStatus: 200,
     expectKeys: [
@@ -310,13 +348,12 @@ module.exports = [
       'files[0].meta.policy',
       'files[0].meta.uploadUrl'
     ],
-    after: function(ctrllr, response) {
-      var
-        deferred = $q.defer(),
-        FormData = require('form-data'),
-        policy = response.body.files[0].meta.policy || {},
-        form = new FormData(),
-        uploadUrl = response.body.files[0].meta.uploadUrl;
+    after(ctrllr, response) {
+      const deferred = $q.defer();
+      const FormData = require('form-data');
+      const policy = response.body.files[0].meta.policy || {};
+      const form = new FormData();
+      const uploadUrl = response.body.files[0].meta.uploadUrl;
 
       for (var key in policy) {
         form.append(key, policy[key]);
@@ -324,10 +361,8 @@ module.exports = [
 
       form.append('file', fs.createReadStream(__dirname + '/../../../bin/text-icon.png'));
 
-      log.debug('created form', form);
-
-      form.submit(uploadUrl, function(err, res) {
-        ctrllr.assert('should have uploaded without errors', function() {
+      form.submit(uploadUrl, (err, res) => {
+        ctrllr.assert('should have uploaded without errors', () => {
           if (err) {
             console.log('error uploading', err);
             return false;
@@ -335,9 +370,17 @@ module.exports = [
 
           return true;
         });
-        ctrllr.assert('should return a proper status from amazon', function() {
-          return res && res.statusCode && res.statusCode >= 200 && res.statusCode < 400;
-        }, 200, res.statusCode);
+
+        ctrllr.assert(
+          'should return a proper status from amazon',
+          () =>
+            res &&
+            res.statusCode &&
+            res.statusCode >= 200 &&
+            res.statusCode < 400,
+          200,
+          res.statusCode
+        );
 
         deferred.resolve(true);
       });
@@ -353,27 +396,29 @@ module.exports = [
     $$send: {
       size: 381927,
       mime: 'video/mp4',
-      type: 'userAvatar',
+      type: 'userAvatar'
     },
     expectStatus: 200,
-    after: function(ctrllr, response) {
-      var
-        deferred = $q.defer(),
-        FormData = require('form-data'),
-        policy = response.body.files[0].meta.policy || {},
-        form = new FormData(),
-        uploadUrl = response.body.files[0].meta.uploadUrl;
+    after(ctrllr, response) {
+      const deferred = $q.defer();
+      const FormData = require('form-data');
+      const policy = response.body.files[0].meta.policy || {};
+      const form = new FormData();
+      const uploadUrl = response.body.files[0].meta.uploadUrl;
 
-      for (var key in policy) {
+      for (let key in policy) {
         form.append(key, policy[key]);
       }
 
-      form.append('file', fs.createReadStream(__dirname + '/../../../bin/text-icon.png'));
+      form.append(
+        'file',
+        fs.createReadStream(`${__dirname}/../../../bin/text-icon.png`)
+      );
 
       log.debug('created form', form);
 
-      form.submit(uploadUrl, function(err, res) {
-        ctrllr.assert('should have uploaded without errors', function() {
+      form.submit(uploadUrl, (err, res) => {
+        ctrllr.assert('should have uploaded without errors', () => {
           if (err) {
             console.log('error uploading', err);
             return false;
@@ -382,10 +427,16 @@ module.exports = [
           return true;
         });
 
-        ctrllr.assert('should return a proper status from amazon', function() {
-          console.log('status code', res ? res.statusCode : null);
-          return res && res.statusCode && res.statusCode >= 200 && res.statusCode < 400;
-        }, 200, res.statusCode);
+        ctrllr.assert(
+          'should return a proper status from amazon',
+          () =>
+            res &&
+            res.statusCode &&
+            res.statusCode >= 200 &&
+            res.statusCode < 400,
+          200,
+          res.statusCode
+        );
 
         deferred.resolve(true);
       });

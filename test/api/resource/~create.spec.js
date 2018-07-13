@@ -4,7 +4,16 @@
 
 import $q from 'q';
 import fs from 'fs';
+import { argv } from 'optimist';
 import log from 'alfred/services/logger';
+
+const proxy = argv.proxy || null;
+
+if (proxy) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  process.env.HTTPS_PROXY = proxy;
+  process.env.HTTP_PROXY = proxy;
+}
 
 /* ==========================================================================
    Exports - test configuration
@@ -25,7 +34,7 @@ module.exports = [
     expectStatus: 400,
     $$send: {
       size: 1024,
-      type: 'userAvatar'
+      type: 'userAvatar',
     }
   },
   {
@@ -36,7 +45,7 @@ module.exports = [
     expectStatus: 400,
     $$send: {
       mime: 'image/jpeg',
-      type: 'userAvatar'
+      type: 'userAvatar',
     }
   },
   {
@@ -59,7 +68,7 @@ module.exports = [
     $$send: {
       size: 1024,
       mime: 'image/jpeg',
-      type: 'asdf'
+      type: 'asdf',
     }
   },
   {
@@ -150,17 +159,18 @@ module.exports = [
         req = require('request'),
         configLoader = require('alfred/services/configLoader'),
         stats = fs.statSync(__dirname + '/../../../bin/text-icon.png'),
-        proxy = configLoader.get('proxy') || null,
         payload = {
           url: response.body.files[0].meta.uploadUrl,
           headers: {
-            'Content-Type': 'image/jpeg',
+            // 'Content-Type': 'image/jpeg',
+            'Content-Type': 'multipart/form-data',
             'Content-Length': 2323
           },
           formData: {
             file: fs.createReadStream(__dirname + '/../../../bin/text-icon.png')
           },
-          // proxy: proxy
+          proxy: proxy,
+          rejectUnauthorized : false
         };
 
       // log.info('prepared proxy', proxy);
@@ -259,12 +269,15 @@ module.exports = [
         payload = {
           url: response.body.files[0].meta.uploadUrl,
           headers: {
-            'Content-Type': 'image/jpeg',
+            // 'Content-Type': 'image/jpeg',
+            'Content-Type': 'multipart/form-data',
             'Content-Length': 2323
           },
           formData: {
             file: fs.createReadStream(__dirname + '/../../../bin/text-icon.png')
-          }
+          },
+          proxy: proxy,
+          rejectUnauthorized : false
         };
 
       req.put(payload, function(err, httpResponse, body) {
@@ -312,7 +325,10 @@ module.exports = [
     after: function(ctrllr, response) {
       var
         deferred = $q.defer(),
+        req = require('request'),
         FormData = require('form-data'),
+        fetch = require('node-fetch'),
+        HttpsProxyAgent = require('https-proxy-agent'),
         policy = response.body.files[0].meta.policy || {},
         form = new FormData(),
         uploadUrl = response.body.files[0].meta.uploadUrl;
@@ -323,23 +339,42 @@ module.exports = [
 
       form.append('file', fs.createReadStream(__dirname + '/../../../bin/text-icon.png'));
 
-      log.debug('created form', form);
+      fetch(uploadUrl, {
+        method: 'POST',
+        body: form,
+        agent: proxy ? new HttpsProxyAgent(proxy) : null,
+        headers: {
+          'Content-Length': 2131
+        }
+      }).then(function(res) {
+        console.log('got res', res);
 
-      form.submit(uploadUrl, function(err, res) {
-        ctrllr.assert('should have uploaded without errors', function() {
-          if (err) {
-            console.log('error uploading', err);
-            return false;
-          }
-
-          return true;
-        });
         ctrllr.assert('should return a proper status from amazon', function() {
-          return res && res.statusCode && res.statusCode >= 200 && res.statusCode < 400;
-        }, 200, res.statusCode);
+          return res && res.status && res.status >= 200 && res.status < 400;
+        }, 200, res.status);
 
         deferred.resolve(true);
+      }).catch(function(err) {
+        log.error('error', err, '');
+        ctrllr.assert('should have executed without any errors', false);
+        return deferred.reject();
       });
+
+      // form.submit(uploadUrl, function(err, res) {
+      //   ctrllr.assert('should have uploaded without errors', function() {
+      //     if (err) {
+      //       console.log('error uploading', err);
+      //       return false;
+      //     }
+      //
+      //     return true;
+      //   });
+      //   ctrllr.assert('should return a proper status from amazon', function() {
+      //     return res && res.statusCode && res.statusCode >= 200 && res.statusCode < 400;
+      //   }, 200, res.statusCode);
+      //
+      //   deferred.resolve(true);
+      // });
 
       return deferred.promise;
     }
@@ -358,10 +393,22 @@ module.exports = [
     after: function(ctrllr, response) {
       var
         deferred = $q.defer(),
+        req = require('request'),
         FormData = require('form-data'),
         policy = response.body.files[0].meta.policy || {},
         form = new FormData(),
-        uploadUrl = response.body.files[0].meta.uploadUrl;
+        uploadUrl = response.body.files[0].meta.uploadUrl,
+        payload = {
+          url: response.body.files[0].meta.uploadUrl,
+          headers: {
+            // 'Content-Type': 'image/jpeg',
+            'Content-Type': 'multipart/form-data',
+            'Content-Length': 2323
+          },
+          formData: form,
+          proxy: proxy,
+          rejectUnauthorized : false
+        };
 
       for (var key in policy) {
         form.append(key, policy[key]);
@@ -371,7 +418,7 @@ module.exports = [
 
       log.debug('created form', form);
 
-      form.submit(uploadUrl, function(err, res) {
+      req.put(payload, function(err, httpResponse, body) {
         ctrllr.assert('should have uploaded without errors', function() {
           if (err) {
             console.log('error uploading', err);
@@ -382,9 +429,9 @@ module.exports = [
         });
 
         ctrllr.assert('should return a proper status from amazon', function() {
-          console.log('status code', res ? res.statusCode : null);
-          return res && res.statusCode && res.statusCode >= 200 && res.statusCode < 400;
-        }, 200, res.statusCode);
+          console.log('status code', httpResponse ? httpResponse.statusCode : null);
+          return httpResponse && httpResponse.statusCode && httpResponse.statusCode >= 200 && httpResponse.statusCode < 400;
+        }, 200, httpResponse.statusCode);
 
         deferred.resolve(true);
       });
