@@ -13,6 +13,9 @@ let File;
 let Location;
 let Vendor;
 let HoursOfOperation;
+let Menu;
+let MenuCategory;
+let MenuItem;
 
 const initialize = async () => {
   await configLoader.init();
@@ -22,6 +25,9 @@ const initialize = async () => {
   Location = require(baseDir + '/models/location').default;
   Vendor = require(baseDir + '/models/vendor').default;
   HoursOfOperation = require(baseDir + '/models/hoursOfOperation').default;
+  Menu = require(baseDir + '/models/menu').default;
+  MenuCategory = require(baseDir + '/models/MenuCategory').default;
+  MenuItem = require(baseDir + '/models/menuItem').default;
 };
 
 initialize();
@@ -211,6 +217,36 @@ function createVendor() {
       })
     ],
     status: 'pending'
+  });
+}
+
+/**
+ * creates a generic menu
+ * @return {Vendor}
+ */
+function createMenu() {
+  // creates a menu with 3 categories
+  // the first category has 0 items
+  // the second category has 2 items
+  // the third category has 2 items
+  return new Menu({
+    categories: [0, 1, 2].map(
+      i =>
+        new MenuCategory({
+          title: random(10),
+          items: Array.from({ length: i }, (v, i2) => i2).map(
+            () =>
+              new MenuItem({
+                title: random(10),
+                description: random(50),
+                price: 10.5,
+                imageURLs: [1, 2, 3].map(
+                  () => `https://${random(10)}.com/${random(10)}.jpg`
+                )
+              })
+          )
+        })
+    )
   });
 }
 
@@ -607,6 +643,27 @@ module.exports = [
       }
 
       store.set('user-1', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `menu-0`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const { vendor } = store.get('user-0');
+    const menu = createMenu();
+
+    menu.vendor = vendor;
+    menu.save((err, doc) => {
+      if (err) {
+        console.error('Error creating `menu-0` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      }
+
+      store.set('menu-0', doc);
       return resolve(doc);
     });
 

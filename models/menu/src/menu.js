@@ -11,7 +11,7 @@ const Menu = new mongoose.Schema({
   categories: [MenuCategory.schema],
   vendor: {
     type: ObjectId,
-    ref: 'Menu',
+    ref: 'Vendor',
     required: true
   }
 });

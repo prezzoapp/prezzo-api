@@ -1,6 +1,5 @@
 // @flow
 import mongoose from 'mongoose';
-
 import MenuItem from '../../../models/menuItem';
 
 const MenuCategory = new mongoose.Schema({
@@ -14,7 +13,7 @@ const MenuCategory = new mongoose.Schema({
     trim: true
   },
   items: {
-    type: [MenuItem],
+    type: [MenuItem.schema],
     default: []
   }
 });
