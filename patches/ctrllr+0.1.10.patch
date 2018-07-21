@@ -1270,6 +1270,24 @@ deleted file mode 100644
 -  .add(test4)
 -  .start();
 \ No newline at end of file
+--- a/node_modules/ctrllr/lib/interface.js
++++ b/node_modules/ctrllr/lib/interface.js
+@@ -57,8 +57,13 @@ Interface.prototype.assert = function(description, bool, expectedValue, actualVa
+   var isSuccessful = true;
+ 
+   if (typeof bool === 'function') {
+-    // if function passed, get result
+-    bool = bool();
++    try {
++      // if function passed, get result
++      bool = bool();
++    } catch (e) {
++      log.assertionMeta(false, 'ERROR RUNNING TEST: ', e);
++      bool = false;
++    }
+   }
+ 
+   if (bool === true) {
 --- a/node_modules/ctrllr/lib/util.js
 +++ b/node_modules/ctrllr/lib/util.js
 @@ -170,15 +170,19 @@ exports.countdown = function(promise, max) {
