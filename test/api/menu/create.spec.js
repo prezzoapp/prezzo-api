@@ -11,7 +11,7 @@ module.exports = [
       'should return status 403 (forbidden) if the user isnt a vendor',
     path: '/v1/menus',
     method: 'POST',
-    $$basicAuth: 'user-2',
+    $$basicAuth: 'user-3',
     expectStatus: 403
   },
   {
@@ -26,7 +26,7 @@ module.exports = [
     description: 'should create a menu on success',
     path: '/v1/menus',
     method: 'POST',
-    $$basicAuth: 'user-1',
+    $$basicAuth: 'user-2',
     expectStatus: 200,
     $$expectKeyValue: {
       vendor: '{{ user-1.vendor }}'

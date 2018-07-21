@@ -649,6 +649,27 @@ module.exports = [
     return promise;
   },
 
+  // create `vendor-2`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-2');
+    const vendor = createVendor();
+
+    user.vendor = vendor;
+    user.save((err, doc) => {
+      if (err) {
+        console.error('Error creating `user-0` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      }
+
+      store.set('user-2', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
   // create `menu-0`,
   ctrllr => {
     const { promise, resolve, reject } = $q.defer();
@@ -664,6 +685,27 @@ module.exports = [
       }
 
       store.set('menu-0', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `menu-1`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const { vendor } = store.get('user-1');
+    const menu = createMenu();
+
+    menu.vendor = vendor;
+    menu.save((err, doc) => {
+      if (err) {
+        console.error('Error creating `menu-1` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      }
+
+      store.set('menu-1', doc);
       return resolve(doc);
     });
 
