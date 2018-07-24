@@ -74,3 +74,43 @@ export const addCategoryToMenu = (menu: any, category: any) => {
 
   return promise;
 };
+
+export const updateCategoryInMenu = (
+  menuId: string,
+  categoryId: string,
+  category: any
+) => {
+  debug('updating category in menu');
+  const { promise, resolve, reject } = $q.defer();
+  const update = {};
+  Object.keys(category).forEach(key => {
+    update[`categories.$.${key}`] = category[key];
+  });
+
+  debug('finding menu and category', menuId, categoryId);
+  debug('built `update` query', update);
+
+  Menu.findOneAndUpdate(
+    {
+      _id: menuId,
+      'categories._id': categoryId
+    },
+    {
+      $set: update
+    },
+    {
+      new: true
+    },
+    (err, updatedMenu) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!updatedMenu) {
+        return reject(new ResourceNotFoundError('Unable to find menu.'));
+      }
+
+      return resolve(updatedMenu);
+    }
+  );
+
+  return promise;
+};
