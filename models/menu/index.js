@@ -114,3 +114,35 @@ export const updateCategoryInMenu = (
 
   return promise;
 };
+
+export const deleteCategoryInMenu = (menuId: string, categoryId: string) => {
+  debug('deleting category in menu');
+  const { promise, resolve, reject } = $q.defer();
+
+  Menu.findOneAndUpdate(
+    {
+      _id: menuId
+    },
+    {
+      $pull: {
+        categories: {
+          _id: categoryId
+        }
+      }
+    },
+    {
+      new: true
+    },
+    (err, updatedMenu) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!updatedMenu) {
+        return reject(new ResourceNotFoundError('Unable to find menu.'));
+      }
+
+      return resolve(updatedMenu);
+    }
+  );
+
+  return promise;
+};
