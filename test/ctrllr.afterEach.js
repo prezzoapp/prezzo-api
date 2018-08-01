@@ -8,6 +8,7 @@ import User from '../models/user';
 import Resource from '../models/resource';
 import Location from '../models/location';
 import Vendor from '../models/vendor';
+import Menu from '../models/menu';
 
 /* ==========================================================================
  Helper functions
@@ -88,6 +89,22 @@ module.exports = [
     const deferred = $q.defer();
 
     Vendor.remove(() => {
+      deferred.resolve('resolved!');
+    });
+
+    return deferred.promise;
+  },
+
+  /**
+   * clear all menus from database
+   * @param ctrllr {CTRLLR} CTRLLR instance
+   * @param response {Object} response object of request
+   * @returns {*}
+   */
+  () => {
+    const deferred = $q.defer();
+
+    Menu.remove(() => {
       deferred.resolve('resolved!');
     });
 

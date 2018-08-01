@@ -32,7 +32,23 @@ module.exports = [
       '/v1/menus/{{ menu-0._id }}/categories/{{ menu-0.categories[1]._id }}',
     method: 'DEL',
     $$basicAuth: 'user-0',
-    expectStatus: 200
+    expectStatus: 200,
+    $$expectKeyValue: {
+      categories: { $length: 2 },
+      'categories[0]._id': '{{ menu-0.categories[0]._id }}',
+      'categories[1]._id': '{{ menu-0.categories[2]._id }}'
+    },
+    $$assertModel: [
+      {
+        $model: 'menu',
+        $_id: '{{ menu-0._id }}',
+        $values: {
+          categories: { $length: 2 },
+          'categories[0]._id': '{{ menu-0.categories[0]._id }}',
+          'categories[1]._id': '{{ menu-0.categories[2]._id }}'
+        }
+      }
+    ]
   },
   {
     description: 'should NOT delete any other categories in the menu',
