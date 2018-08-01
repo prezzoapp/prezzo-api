@@ -179,3 +179,59 @@ export const addItemToMenuCategory = (
 
   return promise;
 };
+
+export const updateItemInMenuCategory = (
+  menuId: string,
+  categoryId: string,
+  itemId: string,
+  menu: any,
+  item: any
+) => {
+  debug('updating category in menu');
+  const { promise, resolve, reject } = $q.defer();
+  const update = {};
+  let itemIndex = -1;
+
+  for (let i = 0; i < menu.categories.length; i += 1) {
+    for (let i2 = 0; i2 < menu.categories[i].items.length; i2 += 1) {
+      if (menu.categories[i].items[i2]._id.toString() === itemId) {
+        itemIndex = i2;
+      }
+    }
+  }
+
+  if (itemIndex === -1) {
+    return deferReject(new ResourceNotFoundError('That item doesnt exist.'), promise);
+  }
+
+  Object.keys(item).forEach(key => {
+    update[`categories.$.items.${itemIndex}.${key}`] = item[key];
+  });
+
+  debug('finding menu, category and item', menuId, categoryId, itemId);
+  debug('built `update` query', update);
+
+  Menu.findOneAndUpdate(
+    {
+      _id: menuId,
+      'categories._id': categoryId
+    },
+    {
+      $set: update
+    },
+    {
+      new: true
+    },
+    (err, updatedMenu) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!updatedMenu) {
+        return reject(new ResourceNotFoundError('Unable to find menu.'));
+      }
+
+      return resolve(updatedMenu);
+    }
+  );
+
+  return promise;
+};
