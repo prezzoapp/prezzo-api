@@ -47,6 +47,45 @@ module.exports = [
     expectStatus: 403
   },
   {
+    description:
+      'should return status 404 (resource not found) if the menu doesn’t exist',
+    $$url:
+      '/v1/menus/{{ randomObjectId }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}' +
+      '/photos',
+    $$basicAuth: 'user-1',
+    method: 'DEL',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resource not found) if the category doesn’t exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ randomObjectId }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}' +
+      '/photos',
+    $$basicAuth: 'user-1',
+    method: 'DEL',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resource not found) if the item doesn’t exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ randomObjectId }}' +
+      '/photos',
+    $$basicAuth: 'user-1',
+    method: 'DEL',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
     description: 'should remove the image from the menu item on success',
     $$url:
       '/v1/menus/{{ menu-0._id }}' +

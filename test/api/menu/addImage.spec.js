@@ -35,6 +35,45 @@ module.exports = [
   },
   {
     description:
+      'should return status 404 (resource not found) if the menu doesnt exist',
+    $$url:
+      '/v1/menus/{{ randomObjectId }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}' +
+      '/photos',
+    $$basicAuth: 'user-0',
+    method: 'POST',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resource not found) if the menu doesnt exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ randomObjectId }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}' +
+      '/photos',
+    $$basicAuth: 'user-0',
+    method: 'POST',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resource not found) if the menu doesnt exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ randomObjectId }}' +
+      '/photos',
+    $$basicAuth: 'user-0',
+    method: 'POST',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
       'should return status 403 (forbidden) if the menu doesn’t belong to the vendor',
     $$url:
       '/v1/menus/{{ menu-0._id }}' +

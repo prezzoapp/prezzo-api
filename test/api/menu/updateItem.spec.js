@@ -42,6 +42,42 @@ module.exports = [
     expectStatus: 403
   },
   {
+    description:
+      'should return status 404 (resouce not found) if the menu doesnt exist',
+    $$url:
+      '/v1/menus/{{ randomObjectId }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}',
+    method: 'PUT',
+    $$basicAuth: 'user-0',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resouce not found) if the category doesnt exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ randomObjectId }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}',
+    method: 'PUT',
+    $$basicAuth: 'user-0',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resouce not found) if the item doesnt exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ randomObjectId }}',
+    method: 'PUT',
+    $$basicAuth: 'user-0',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
     description: 'should update the item in the menu on success',
     $$url: '/v1/menus/{{ menu-0._id }}' +
       '/categories/{{ menu-0.categories[2]._id }}' +

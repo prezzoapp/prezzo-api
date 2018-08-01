@@ -35,6 +35,15 @@ module.exports = [
   },
   {
     description:
+      'should return status 404 (resource not found) if the menu doesn’t exist',
+    $$url: '/v1/menus/{{ randomObjectId }}/categories',
+    method: 'POST',
+    $$basicAuth: 'user-0',
+    $$send: getPayload,
+    expectStatus: 404
+  },
+  {
+    description:
       'should return status 400 (bad request) if a category exists in the menu with the same title',
     $$url: '/v1/menus/{{ menu-0._id }}/categories',
     method: 'POST',

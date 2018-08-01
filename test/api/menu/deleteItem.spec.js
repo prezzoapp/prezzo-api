@@ -33,6 +33,39 @@ module.exports = [
     expectStatus: 403
   },
   {
+    description:
+      'should return status 404 (resource not found) if the menu doesn’t exist',
+    $$url:
+      '/v1/menus/{{ randomObjectId }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}',
+    method: 'DEL',
+    $$basicAuth: 'user-0',
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resource not found) if the category doesn’t exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ randomObjectId }}' +
+      '/items/{{ menu-0.categories[2].items[1]._id }}',
+    method: 'DEL',
+    $$basicAuth: 'user-0',
+    expectStatus: 404
+  },
+  {
+    description:
+      'should return status 404 (resource not found) if the item doesn’t exist',
+    $$url:
+      '/v1/menus/{{ menu-0._id }}' +
+      '/categories/{{ menu-0.categories[2]._id }}' +
+      '/items/{{ randomObjectId }}',
+    method: 'DEL',
+    $$basicAuth: 'user-0',
+    expectStatus: 404
+  },
+  {
     description: 'should delete the item on success',
     $$url:
       '/v1/menus/{{ menu-0._id }}' +
