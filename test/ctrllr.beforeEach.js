@@ -227,7 +227,7 @@ function createVendor() {
 function createMenu() {
   // creates a menu with 3 categories
   // the first category has 0 items
-  // the second category has 2 items
+  // the second category has 1 items
   // the third category has 2 items
   return new Menu({
     categories: [0, 1, 2].map(
