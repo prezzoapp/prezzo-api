@@ -2,6 +2,7 @@
 import $q from 'q';
 import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
 import { debug } from 'alfred/services/logger';
+import { deferReject } from 'alfred/services/util';
 import MenuCategory from '../../models/menuCategory';
 
 const Menu = require('../../services/mongo').registerModel(__dirname, 'Menu');
@@ -256,6 +257,59 @@ export const deleteItemInMenuCategory = (
         'categories.$.items': {
           _id: itemId
         }
+      }
+    },
+    {
+      new: true
+    },
+    (err, updatedMenu) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!updatedMenu) {
+        return reject(new ResourceNotFoundError('Unable to find menu.'));
+      }
+
+      return resolve(updatedMenu);
+    }
+  );
+
+  return promise;
+};
+
+export const addPhotoToMenuCategoryItem = (
+  menuId: string,
+  categoryId: string,
+  itemId: string,
+  menu: any,
+  imageURL: string
+) => {
+  debug('adds an image to a menu category item');
+  const { promise, resolve, reject } = $q.defer();
+  let itemIndex = -1;
+
+  for (let i = 0; i < menu.categories.length; i += 1) {
+    for (let i2 = 0; i2 < menu.categories[i].items.length; i2 += 1) {
+      if (menu.categories[i].items[i2]._id.toString() === itemId) {
+        itemIndex = i2;
+      }
+    }
+  }
+
+  if (itemIndex === -1) {
+    return deferReject(
+      new ResourceNotFoundError('That item doesnt exist.'),
+      promise
+    );
+  }
+
+  Menu.findOneAndUpdate(
+    {
+      _id: menuId,
+      'categories._id': categoryId
+    },
+    {
+      $push: {
+        [`categories.$.items.${itemIndex}.imageURLs`]: imageURL
       }
     },
     {
