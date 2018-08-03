@@ -34,6 +34,10 @@
   - denied  
 -  defaults to `pending`  
   
+**menu**  
+-  ObjectID  
+-  reference to `Menu`  
+  
 **_id**  
 -  ObjectID  
   

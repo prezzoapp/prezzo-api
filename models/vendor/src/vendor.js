@@ -4,6 +4,7 @@ import Location from '../../../models/location';
 import HoursOfOperation from '../../../models/hoursOfOperation';
 import categories from '../config/categories';
 
+const { ObjectId } = mongoose.Schema.Types;
 const Vendor = new mongoose.Schema({
   createdDate: {
     type: Date,
@@ -39,6 +40,10 @@ const Vendor = new mongoose.Schema({
     enum: ['pending', 'approved', 'denied'],
     default: 'pending',
     required: true
+  },
+  menu: {
+    type: ObjectId,
+    ref: 'Menu'
   }
 });
 

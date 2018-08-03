@@ -30,6 +30,26 @@ module.exports = [
     expectStatus: 200,
     $$expectKeyValue: {
       vendor: '{{ vendor-2._id }}'
-    }
+    },
+    $$assertModel: [
+      {
+        $model: 'menu',
+        $_id: '{{   __RESPONSE__.body._id }}',
+        $values: {
+          vendor: '{{ vendor-2._id }}'
+        }
+      },
+      {
+        $model: 'vendor',
+        $_id: '{{ vendor-2._id }}',
+        $values: {
+          menu: (value, ctrllr) => {
+            const store = ctrllr.getStore();
+            const vendor = store.get('__RESPONSE__').body._id.toString();
+            return value && value.toString && value.toString() === vendor;
+          }
+        }
+      }
+    ]
   }
 ];

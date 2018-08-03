@@ -23,7 +23,7 @@ module.exports = {
       const { promise, resolve, reject } = $q.defer();
       const { vendor } = req.user;
 
-      findMenuByVendor(vendor)
+      findMenuByVendor(vendor._id || vendor)
         .then(() =>
           reject(new ForbiddenError('You have already created a menu.'))
         )
@@ -34,7 +34,8 @@ module.exports = {
   ],
   async run(req: $Request, res: $Response) {
     try {
-      const menu = await createMenu({ vendor: req.user.vendor });
+      const { vendor } = req.user;
+      const menu = await createMenu(vendor._id || vendor);
       res.$end(menu);
     } catch (e) {
       log.warn('Failed to create menu.', e);

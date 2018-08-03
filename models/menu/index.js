@@ -4,12 +4,40 @@ import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
 import { debug } from 'alfred/services/logger';
 import { deferReject } from 'alfred/services/util';
 import MenuCategory from '../../models/menuCategory';
+import Vendor from '../../models/vendor';
 
 const Menu = require('../../services/mongo').registerModel(__dirname, 'Menu');
 
 export default Menu;
 
-export const createMenu = async (params: any) => new Menu(params).save();
+export const createMenu = vendor => {
+  const { promise, resolve, reject } = $q.defer();
+  const menu = new Menu({ vendor });
+
+  menu.save(err => {
+    if (err) {
+      return reject(new ServerError(err));
+    }
+
+    Vendor.findByIdAndUpdate(
+      vendor,
+      {
+        menu
+      },
+      (err2, updatedVendor) => {
+        if (err) {
+          return reject(new ServerError(err2));
+        } else if (!updatedVendor) {
+          return reject(new ResourceNotFoundError('Failed to find vendor.'));
+        }
+
+        return resolve(menu);
+      }
+    );
+  });
+
+  return promise;
+};
 
 export const findMenuByVendor = async (vendor: string) => {
   const { promise, resolve, reject } = $q.defer();

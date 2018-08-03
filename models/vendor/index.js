@@ -41,6 +41,25 @@ export const createVendor = (user, vendor) => {
   return promise;
 };
 
+export const findVendorById = vendorId => {
+  const { promise, resolve, reject } = $q.defer();
+
+  User.findByIdAndUpdate(
+    vendorId,
+    (err2, updatedUser) => {
+      if (err) {
+        return reject(new ServerError(err2));
+      } else if (!updatedUser) {
+        return reject(new ResourceNotFoundError('Failed to find user.'));
+      }
+
+      return resolve(savedVendor);
+    }
+  );
+
+  return promise;
+};
+
 export const updateVendor = (vendorId, params) => {
   const { promise, resolve, reject } = $q.defer();
 
