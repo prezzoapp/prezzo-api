@@ -709,18 +709,30 @@ module.exports = [
   ctrllr => {
     const { promise, resolve, reject } = $q.defer();
     const store = ctrllr.getStore();
-    const { vendor } = store.get('user-0');
+    const vendor = store.get('vendor-0');
     const menu = createMenu();
 
-    menu.vendor = vendor;
+    menu.vendor = vendor._id;
     menu.save((err, doc) => {
       if (err) {
         console.error('Error creating `menu-0` in `ctrllr.beforeEach`!', err);
         return reject(err);
       }
 
-      store.set('menu-0', doc);
-      return resolve(doc);
+      vendor.menu = menu._id;
+      vendor.save((err2, updatedVendor) => {
+        if (err) {
+          console.error(
+            'Error creating `menu-0` in `ctrllr.beforeEach`!',
+            err2
+          );
+          return reject(err2);
+        }
+
+        store.set('menu-0', doc);
+        store.set('vendor-0', updatedVendor);
+        return resolve(doc);
+      });
     });
 
     return promise;
@@ -730,7 +742,7 @@ module.exports = [
   ctrllr => {
     const { promise, resolve, reject } = $q.defer();
     const store = ctrllr.getStore();
-    const { vendor } = store.get('user-1');
+    const vendor = store.get('vendor-1');
     const menu = createMenu();
 
     menu.vendor = vendor;
@@ -740,8 +752,20 @@ module.exports = [
         return reject(err);
       }
 
-      store.set('menu-1', doc);
-      return resolve(doc);
+      vendor.menu = menu._id;
+      vendor.save((err2, updatedVendor) => {
+        if (err) {
+          console.error(
+            'Error creating `menu-1` in `ctrllr.beforeEach`!',
+            err2
+          );
+          return reject(err2);
+        }
+
+        store.set('menu-1', doc);
+        store.set('vendor-1', updatedVendor);
+        return resolve(doc);
+      });
     });
 
     return promise;

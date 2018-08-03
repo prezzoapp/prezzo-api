@@ -17,3 +17,6 @@ Parameters
 Specifications  
 --------------  
   
+- should require authorization  
+- should return the authenticated user  
+- should return vendor and menu information if the user is a vendor  
