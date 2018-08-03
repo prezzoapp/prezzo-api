@@ -52,7 +52,8 @@
 -  reference to `Session`  
   
 **vendor**  
--  Embedded  
+-  ObjectID  
+-  reference to `Vendor`  
   
 **_id**  
 -  ObjectID  

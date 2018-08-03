@@ -32,6 +32,7 @@
   - pending  
   - approved  
   - denied  
+-  defaults to `pending`  
   
 **_id**  
 -  ObjectID  

@@ -614,15 +614,26 @@ module.exports = [
     const user = store.get('user-0');
     const vendor = createVendor();
 
-    user.vendor = vendor;
-    user.save((err, doc) => {
+    vendor.save(err => {
       if (err) {
-        console.error('Error creating `user-0` in `ctrllr.beforeEach`!', err);
+        console.error('Error creating `vendor-0` in `ctrllr.beforeEach`!', err);
         return reject(err);
       }
 
-      store.set('user-0', doc);
-      return resolve(doc);
+      user.vendor = vendor._id;
+      user.save((err2, doc) => {
+        if (err) {
+          console.error(
+            'Error creating `vendor-0` in `ctrllr.beforeEach`!',
+            err2
+          );
+          return reject(err2);
+        }
+
+        store.set('user-0', doc);
+        store.set('vendor-0', vendor);
+        return resolve(doc);
+      });
     });
 
     return promise;
@@ -635,15 +646,27 @@ module.exports = [
     const user = store.get('user-1');
     const vendor = createVendor();
 
-    user.vendor = vendor;
-    user.save((err, doc) => {
+    vendor.location = createLocation2();
+    vendor.save(err => {
       if (err) {
-        console.error('Error creating `user-0` in `ctrllr.beforeEach`!', err);
+        console.error('Error creating `vendor-1` in `ctrllr.beforeEach`!', err);
         return reject(err);
       }
 
-      store.set('user-1', doc);
-      return resolve(doc);
+      user.vendor = vendor._id;
+      user.save((err2, doc) => {
+        if (err) {
+          console.error(
+            'Error creating `vendor-1` in `ctrllr.beforeEach`!',
+            err2
+          );
+          return reject(err2);
+        }
+
+        store.set('user-1', doc);
+        store.set('vendor-1', vendor);
+        return resolve(doc);
+      });
     });
 
     return promise;
@@ -656,15 +679,27 @@ module.exports = [
     const user = store.get('user-2');
     const vendor = createVendor();
 
-    user.vendor = vendor;
-    user.save((err, doc) => {
+    vendor.location = createLocation4();
+    vendor.save(err => {
       if (err) {
-        console.error('Error creating `user-0` in `ctrllr.beforeEach`!', err);
+        console.error('Error creating `vendor-2` in `ctrllr.beforeEach`!', err);
         return reject(err);
       }
 
-      store.set('user-2', doc);
-      return resolve(doc);
+      user.vendor = vendor._id;
+      user.save((err2, doc) => {
+        if (err) {
+          console.error(
+            'Error creating `user-2` in `ctrllr.beforeEach`!',
+            err2
+          );
+          return reject(err2);
+        }
+
+        store.set('user-2', doc);
+        store.set('vendor-2', vendor);
+        return resolve(doc);
+      });
     });
 
     return promise;

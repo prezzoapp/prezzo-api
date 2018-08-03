@@ -49,3 +49,5 @@ Specifications
 - should return status 403 (forbidden) if the user is not a vendor  
 - should return status 403 (forbidden) if the user is trying to update another vendor  
 - should update the vendor on success  
+- should retain the values of fields that werent sent  
+- should NOT update other vendors  

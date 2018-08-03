@@ -37,6 +37,7 @@ const Vendor = new mongoose.Schema({
   status: {
     type: String,
     enum: ['pending', 'approved', 'denied'],
+    default: 'pending',
     required: true
   }
 });

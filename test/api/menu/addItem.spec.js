@@ -127,21 +127,6 @@ module.exports = [
             $length: 2
           }
         }
-      },
-      {
-        $model: 'menu',
-        $_id: '{{ menu-2._id }}',
-        $values: {
-          'categories[0].items': {
-            $length: 0
-          },
-          'categories[1].items': {
-            $length: 1
-          },
-          'categories[2].items': {
-            $length: 2
-          }
-        }
       }
     ]
   }

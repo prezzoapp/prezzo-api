@@ -1,9 +1,8 @@
 // @flow
 import mongoose from 'mongoose';
-
 import Session from '../../../models/session';
-import Vendor from '../../../models/vendor';
 
+const { ObjectId } = mongoose.Schema.Types;
 const User = new mongoose.Schema({
   createdDate: {
     type: Date,
@@ -66,7 +65,10 @@ const User = new mongoose.Schema({
     default: true
   },
   sessions: [Session.schema],
-  vendor: Vendor.schema
+  vendor: {
+    type: ObjectId,
+    ref: 'Vendor'
+  }
 });
 
 module.exports = User;

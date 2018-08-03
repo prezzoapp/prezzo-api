@@ -46,7 +46,9 @@ module.exports = {
 
     if (!req.user.vendor) {
       return deferReject(new ForbiddenError('You are not a vendor.'));
-    } else if (req.user.vendor._id.toString() !== vendorId) {
+    } else if (
+      (req.user.vendor._id || req.user.vendor).toString() !== vendorId
+    ) {
       return deferReject(
         new ForbiddenError('You can only update your own vendor account.')
       );
@@ -56,13 +58,13 @@ module.exports = {
     debug('req.body', req.body);
 
     try {
-      const vendor = extend({}, req.body, {
+      const params = extend({}, req.body, {
         location: await Location.fromJSON(req.body.location)
       });
-      const user = await updateVendor(req.user, vendor);
-      return res.$end(user.toObject());
+      const vendor = await updateVendor(req.params.id, params);
+      return res.$end(vendor);
     } catch (e) {
-      warn('Failed to create vendor.', e);
+      warn('Failed to update vendor.', e);
       return res.$fail(new ServerError(e));
     }
   }

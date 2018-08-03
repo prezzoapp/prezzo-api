@@ -29,7 +29,7 @@ module.exports = [
     $$basicAuth: 'user-2',
     expectStatus: 200,
     $$expectKeyValue: {
-      vendor: '{{ user-1.vendor }}'
+      vendor: '{{ vendor-2._id }}'
     }
   }
 ];

@@ -12,65 +12,69 @@ const Vendor = require('../../services/mongo').registerModel(
 export const createVendor = (user, vendor) => {
   const { promise, resolve, reject } = $q.defer();
 
-  User.findByIdAndUpdate(
-    user._id,
-    {
-      vendor: new Vendor(vendor)
-    },
-    {
-      new: true
-    },
-    (err, updatedUser) => {
-      if (err) {
-        return reject(new ServerError(err));
-      } else if (!updatedUser) {
-        return reject(new ResourceNotFoundError('Failed to find user.'));
-      }
-
-      return resolve(updatedUser);
-    }
-  );
-
-  return promise;
-};
-
-export const updateVendor = (user, vendor) => {
-  const { promise, resolve, reject } = $q.defer();
-  const updatedVendor = extend({}, user.vendor, vendor);
-  const vendorToSave = new Vendor(updatedVendor);
-  vendorToSave._id = user.vendor._id;
-
-  User.findByIdAndUpdate(
-    user._id,
-    {
-      vendor: vendorToSave
-    },
-    {
-      new: true
-    },
-    (err, updatedUser) => {
-      if (err) {
-        return reject(new ServerError(err));
-      } else if (!updatedUser) {
-        return reject(new ResourceNotFoundError('Failed to find user.'));
-      }
-
-      return resolve(updatedUser);
-    }
-  );
-
-  return promise;
-};
-
-export const listVendors = () => {
-  const { promise, resolve, reject } = $q.defer();
-
-  User.find({ vendor: { $exists: true }}, (err, users) => {
+  const savedVendor = new Vendor(vendor);
+  savedVendor.save(err => {
     if (err) {
       return reject(new ServerError(err));
     }
 
-    return resolve(users);
+    User.findByIdAndUpdate(
+      user._id,
+      {
+        vendor: savedVendor
+      },
+      {
+        new: true
+      },
+      (err2, updatedUser) => {
+        if (err) {
+          return reject(new ServerError(err2));
+        } else if (!updatedUser) {
+          return reject(new ResourceNotFoundError('Failed to find user.'));
+        }
+
+        return resolve(savedVendor);
+      }
+    );
+  });
+
+  return promise;
+};
+
+export const updateVendor = (vendorId, params) => {
+  const { promise, resolve, reject } = $q.defer();
+
+  Vendor.findByIdAndUpdate(
+    vendorId,
+    {
+      $set: params
+    },
+    {
+      new: true
+    },
+    (err, updatedVendor) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!updatedVendor) {
+        return reject(new ResourceNotFoundError('Failed to find vendor.'));
+      }
+
+      return resolve(updatedVendor);
+    }
+  );
+
+  return promise;
+};
+
+export const listVendors = (params: any) => {
+  const { promise, resolve, reject } = $q.defer();
+
+  Vendor.find(params, (err, vendors) => {
+    if (err) {
+      return reject(new ServerError(err));
+    }
+
+    return resolve(vendors);
   });
 
   return promise;

@@ -51,11 +51,12 @@ module.exports = {
     debug('req.body', req.body);
 
     try {
-      const vendor = extend({}, req.body, {
-        location: await Location.fromJSON(req.body.location)
+      const params = extend({}, req.body, {
+        location: await Location.fromJSON(req.body.location),
+        status: 'pending'
       });
-      const user = await createVendor(req.user, vendor);
-      return res.$end(user.toObject());
+      const vendor = await createVendor(req.user, params);
+      return res.$end(vendor);
     } catch (e) {
       warn('Failed to create vendor.', e);
       return res.$fail(new ServerError(e));

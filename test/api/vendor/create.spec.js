@@ -1,5 +1,6 @@
 // @flow
 import { random } from 'alfred/services/util';
+import { info } from 'alfred/services/logger';
 import categories from '../../../models/vendor/config/categories';
 
 function getLocation() {
@@ -113,32 +114,80 @@ module.exports = [
     $$send: getPayload,
     expectStatus: 200,
     $$expectKeyValue: {
-      'vendor.name': '{{ payload.name }}',
-      'vendor.phone': '{{ payload.phone }}',
-      'vendor.website': '{{ payload.website }}',
-      'vendor.categories[0]': '{{ payload.categories[0] }}',
-      'vendor.categories[2]': '{{ payload.categories[2] }}',
-      'vendor.avatarURL': '{{ payload.avatarURL }}',
-      'vendor.location.name': '{{ payload.location.name }}',
-      'vendor.location.address': '{{ payload.location.address }}',
-      'vendor.location.city': '{{ payload.location.city }}',
-      'vendor.location.region': '{{ payload.location.region }}',
-      'vendor.location.regionShort': '{{ payload.location.regionShort }}',
-      'vendor.location.country': '{{ payload.location.country }}',
-      'vendor.location.countryShort': '{{ payload.location.countryShort }}',
-      'vendor.location.postalCode': '{{ payload.location.postalCode }}',
-      'vendor.location.coordinates[0]': '{{ payload.location.longitude }}',
-      'vendor.location.coordinates[1]': '{{ payload.location.latitude }}',
-      'vendor.hours[0].dayOfWeek': '{{ payload.hours[0].dayOfWeek }}',
-      'vendor.hours[0].openTimeHour': '{{ payload.hours[0].openTimeHour }}',
-      'vendor.hours[0].openTimeMinutes': '{{ payload.hours[0].openTimeMinutes }}',
-      'vendor.hours[0].closeTimeHour': '{{ payload.hours[0].closeTimeHour }}',
-      'vendor.hours[0].closeTimeMinutes': '{{ payload.hours[0].closeTimeMinutes }}',
-      'vendor.hours[1].dayOfWeek': '{{ payload.hours[1].dayOfWeek }}',
-      'vendor.hours[1].openTimeHour': '{{ payload.hours[1].openTimeHour }}',
-      'vendor.hours[1].openTimeMinutes': '{{ payload.hours[1].openTimeMinutes }}',
-      'vendor.hours[1].closeTimeHour': '{{ payload.hours[1].closeTimeHour }}',
-      'vendor.hours[1].closeTimeMinutes': '{{ payload.hours[1].closeTimeMinutes }}'
-    }
+      name: '{{ payload.name }}',
+      phone: '{{ payload.phone }}',
+      website: '{{ payload.website }}',
+      'categories[0]': '{{ payload.categories[0] }}',
+      'categories[2]': '{{ payload.categories[2] }}',
+      avatarURL: '{{ payload.avatarURL }}',
+      'location.name': '{{ payload.location.name }}',
+      'location.address': '{{ payload.location.address }}',
+      'location.city': '{{ payload.location.city }}',
+      'location.region': '{{ payload.location.region }}',
+      'location.regionShort': '{{ payload.location.regionShort }}',
+      'location.country': '{{ payload.location.country }}',
+      'location.countryShort': '{{ payload.location.countryShort }}',
+      'location.postalCode': '{{ payload.location.postalCode }}',
+      'location.coordinates[0]': '{{ payload.location.longitude }}',
+      'location.coordinates[1]': '{{ payload.location.latitude }}',
+      'hours[0].dayOfWeek': '{{ payload.hours[0].dayOfWeek }}',
+      'hours[0].openTimeHour': '{{ payload.hours[0].openTimeHour }}',
+      'hours[0].openTimeMinutes': '{{ payload.hours[0].openTimeMinutes }}',
+      'hours[0].closeTimeHour': '{{ payload.hours[0].closeTimeHour }}',
+      'hours[0].closeTimeMinutes': '{{ payload.hours[0].closeTimeMinutes }}',
+      'hours[1].dayOfWeek': '{{ payload.hours[1].dayOfWeek }}',
+      'hours[1].openTimeHour': '{{ payload.hours[1].openTimeHour }}',
+      'hours[1].openTimeMinutes': '{{ payload.hours[1].openTimeMinutes }}',
+      'hours[1].closeTimeHour': '{{ payload.hours[1].closeTimeHour }}',
+      'hours[1].closeTimeMinutes': '{{ payload.hours[1].closeTimeMinutes }}'
+    },
+    $$assertModel: [
+      {
+        $model: 'user',
+        $_id: '{{ user-3._id }}',
+        $values: {
+          vendor: (value, ctrllr) => {
+            const store = ctrllr.getStore();
+            const vendor = store.get('__RESPONSE__').body._id;
+            return value && value.toString && value.toString() === vendor;
+          }
+        }
+      },
+      {
+        $model: 'vendor',
+        $query: {
+          _id: '{{ __RESPONSE__.body._id }}',
+          name: '{{ payload.name }}'
+        },
+        $values: {
+          name: '{{ payload.name }}',
+          phone: '{{ payload.phone }}',
+          website: '{{ payload.website }}',
+          'categories[0]': '{{ payload.categories[0] }}',
+          'categories[2]': '{{ payload.categories[2] }}',
+          avatarURL: '{{ payload.avatarURL }}',
+          'location.name': '{{ payload.location.name }}',
+          'location.address': '{{ payload.location.address }}',
+          'location.city': '{{ payload.location.city }}',
+          'location.region': '{{ payload.location.region }}',
+          'location.regionShort': '{{ payload.location.regionShort }}',
+          'location.country': '{{ payload.location.country }}',
+          'location.countryShort': '{{ payload.location.countryShort }}',
+          'location.postalCode': '{{ payload.location.postalCode }}',
+          'location.coordinates[0]': '{{ payload.location.longitude }}',
+          'location.coordinates[1]': '{{ payload.location.latitude }}',
+          'hours[0].dayOfWeek': '{{ payload.hours[0].dayOfWeek }}',
+          'hours[0].openTimeHour': '{{ payload.hours[0].openTimeHour }}',
+          'hours[0].openTimeMinutes': '{{ payload.hours[0].openTimeMinutes }}',
+          'hours[0].closeTimeHour': '{{ payload.hours[0].closeTimeHour }}',
+          'hours[0].closeTimeMinutes': '{{ payload.hours[0].closeTimeMinutes }}',
+          'hours[1].dayOfWeek': '{{ payload.hours[1].dayOfWeek }}',
+          'hours[1].openTimeHour': '{{ payload.hours[1].openTimeHour }}',
+          'hours[1].openTimeMinutes': '{{ payload.hours[1].openTimeMinutes }}',
+          'hours[1].closeTimeHour': '{{ payload.hours[1].closeTimeHour }}',
+          'hours[1].closeTimeMinutes': '{{ payload.hours[1].closeTimeMinutes }}'
+        }
+      }
+    ]
   }
 ];

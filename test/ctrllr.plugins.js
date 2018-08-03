@@ -111,6 +111,8 @@ function recursiveInterpolation(store, obj) {
       continue;
     } else if (typeof obj[key] === 'function') {
       continue;
+    } else if (obj[key]._bsontype) {
+      obj[key] = obj[key].toString();
     } else if (typeof obj[key] === 'string') {
       obj[key] = interpolate(store, obj[key]);
     } else if (typeof obj[key] === 'object' && obj[key] instanceof Array) {
@@ -160,6 +162,8 @@ function $$assert(ctrllr, ref, specs, logPrefix) {
 
     if (typeof specs[key] === 'boolean' || typeof specs[key] === 'string' || typeof specs[key] === 'number') {
       valueExpected = specs[key];
+      valueExpected = valueExpected && valueExpected._bsontype ?
+        valueExpected.toString() : valueExpected;
       valueActual = util.evalKeyValue(ref, key);
 
       ctrllr.assert(assertLogPrefix + 'should have the property `' + key + '`' +
@@ -183,6 +187,8 @@ function $$assert(ctrllr, ref, specs, logPrefix) {
     } else if (specs[key] && specs[key]._bsontype) {
       valueExpected = specs[key].toString();
       valueActual = util.evalKeyValue(ref, key);
+      valueActual = valueActual && valueActual.toString ?
+        valueActual.toString() : valueActual;
       if (valueActual) valueActual = valueActual.toString();
 
       ctrllr.assert(assertLogPrefix + 'should have the property `' + key + '`' +
@@ -755,7 +761,7 @@ module.exports = [
             }
 
             if (operation.$values) {
-              for (var i = 0, len = docs.length; i < len; i++) {
+              for (var i = 0, len = docs.length || 1; i < len; i++) {
                 $$assert(ctrllr, docs[i], operation.$values, '$$assertModel[' + operation.$model + ']');
               }
             }
