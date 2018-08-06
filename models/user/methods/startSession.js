@@ -1,5 +1,6 @@
 // @flow
 import { BadRequestError, ResourceNotFoundError } from 'alfred/core/errors';
+import { findVendorById } from '../../../models/vendor';
 
 module.exports = {
   name: 'startSession',
@@ -31,6 +32,10 @@ module.exports = {
         new: true
       }
     );
+
+    if (user.vendor) {
+      user.vendor = await findVendorById(user.vendor);
+    }
 
     if (!user) {
       throw new ResourceNotFoundError('Unable to find user.');
