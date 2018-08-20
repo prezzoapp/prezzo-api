@@ -35,3 +35,4 @@ Specifications
 - should allow email / password login  
 - should succeed even if the emails letter casing is incorrect  
 - should allow setting the `pushToken` on login  
+- should return vendor and menu information on login  
