@@ -87,13 +87,15 @@ export const updateVendor = (vendorId, params) => {
 export const listVendors = (params: any) => {
   const { promise, resolve, reject } = $q.defer();
 
-  Vendor.find(params, (err, vendors) => {
-    if (err) {
-      return reject(new ServerError(err));
-    }
+  Vendor.find(params)
+    .populate('menu')
+    .exec((err, vendors) => {
+      if (err) {
+        return reject(new ServerError(err));
+      }
 
-    return resolve(vendors);
-  });
+      return resolve(vendors);
+    });
 
   return promise;
 };

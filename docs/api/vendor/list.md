@@ -28,3 +28,4 @@ Specifications
 - should return vendors  
 - should allow filtering by vendor business name  
 - should allow filtering by vendor location  
+- should populate the menu  

@@ -143,5 +143,27 @@ module.exports = [
         );
       }
     }
+  },
+  {
+    description: 'should populate the menu',
+    $$url:
+      '/v1/vendors?' +
+      'longitude={{ vendor-0.location.coordinates[0] }}' +
+      '&latitude={{ vendor-0.location.coordinates[1] }}',
+    method: 'GET',
+    $$basicAuth: 'user-0',
+    expectStatus: 200,
+    expectArray: true,
+    $$expectInArray: {
+      'should have returned a populated menu': (value, ctrllr) =>
+        value &&
+        value.menu &&
+        value.menu._id &&
+        value.menu._id ===
+          ctrllr
+            .getStore()
+            .get('menu-0')
+            ._id.toString()
+    }
   }
 ];
