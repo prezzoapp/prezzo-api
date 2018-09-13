@@ -9,9 +9,12 @@ module.exports = {
   priority: 2,
   match: '/v1/users/:id/',
   run(req, res, next) {
-    const query = isObjectId(req.params.id)
-      ? { _id: req.params.id }
-      : { facebookId: req.params.id };
+    const { id } = req.params;
+    const query = isObjectId(id)
+      ? { _id: id }
+      : {
+          $or: [{ facebookId: id }, { email: id.toLowerCase() }]
+        };
 
     User.findOne(query, (err, user) => {
       if (err) {
