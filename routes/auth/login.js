@@ -34,12 +34,13 @@ module.exports = {
       }
     }
   },
-  validate(req) {
-    return findUserByEmail(req.body.email).then(user => {
-      if (!req.data) req.data = {};
-      req.data.user = user;
-    });
-  },
+  validate: [
+    req =>
+      findUserByEmail(req.body.email).then(user => {
+        req.data.user = user;
+      }),
+    req => req.data.user.comparePassword(req.body.password)
+  ],
   async run(req: $Request, res: $Response) {
     try {
       const { type, pushToken } = req.body;

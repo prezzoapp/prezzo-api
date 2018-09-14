@@ -1,16 +1,24 @@
 // @flow
+import $q from 'q';
 import bcrypt from 'bcrypt';
 import { BadRequestError } from 'alfred/core/errors';
 
 module.exports = {
   name: 'comparePassword',
-  async run(testPassword) {
-    const isMatch = await bcrypt.compare(testPassword, this.password);
+  run(testPassword) {
+    const { promise, resolve, reject } = $q.defer();
 
-    if (!isMatch) {
-      throw BadRequestError('Invalid password.');
-    }
+    bcrypt
+      .compare(testPassword, this.password)
+      .then(isMatch => {
+        if (!isMatch) {
+          throw BadRequestError('Invalid password.');
+        }
 
-    return true;
+        resolve();
+      })
+      .catch(reject);
+
+    return promise;
   }
 };
