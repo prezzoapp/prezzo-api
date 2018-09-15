@@ -29,7 +29,10 @@ module.exports = {
       const { name, distance, longitude, latitude } = req.query;
 
       if (name) {
-        params.name = name;
+        params.name = {
+          $regex: new RegExp(name.toLowerCase()),
+          $options: 'i'
+        };
       }
 
       if (longitude && latitude) {
