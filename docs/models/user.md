@@ -43,6 +43,9 @@
 **city**  
 -  String  
   
+**braintreeCustomerId**  
+-  String  
+  
 **isSubscribedToPromotions**  
 -  Boolean  
 -  defaults to `true`  
