@@ -42,27 +42,51 @@ const getConfig = () => config;
  * creates a braintree customer from a user, saves to user model
  * @param user {User} mongoose User instance
  */
-const createCustomer = user => {
-  const { promise, resolve, reject } = $q.defer();
-  const customerConfig = {};
+// const createCustomer = user => {
+//   const { promise, resolve, reject } = $q.defer();
+//   const customerConfig = {};
+//
+//   if (user && (user.firstName || user.name)) {
+//     customerConfig.firstName = user.firstName || user.name;
+//   }
+//   if (user && user.lastName) customerConfig.lastName = user.lastName;
+//   if (user && user.email) customerConfig.email = user.email;
+//   if (user && user.phone) customerConfig.phone = user.phone;
+//
+//   gateway.customer.create(customerConfig, (err, result) => {
+//     if (err) {
+//       return reject(new ServerError(err));
+//     }
+//
+//     return resolve(result);
+//   });
+//
+//   return promise;
+// };
 
-  if (user && (user.firstName || user.name)) {
-    customerConfig.firstName = user.firstName || user.name;
-  }
-  if (user && user.lastName) customerConfig.lastName = user.lastName;
-  if (user && user.email) customerConfig.email = user.email;
-  if (user && user.phone) customerConfig.phone = user.phone;
+/**
+ * creates a braintree customer from a user, saves to user model
+ * @param user {User} mongoose User instance
+ */
+const createCustomer = user =>
+  new Promise((resolve, reject) => {
+    const customerConfig = {};
 
-  gateway.customer.create(customerConfig, (err, result) => {
-    if (err) {
-      return reject(new ServerError(err));
+    if (user && (user.firstName || user.name)) {
+      customerConfig.firstName = user.firstName || user.name;
     }
+    if (user && user.lastName) customerConfig.lastName = user.lastName;
+    if (user && user.email) customerConfig.email = user.email;
+    if (user && user.phone) customerConfig.phone = user.phone;
 
-    return resolve(result);
+    gateway.customer.create(customerConfig, (err, result) => {
+      if (err) {
+        return reject(new ServerError(err));
+      }
+
+      return resolve(result);
+    });
   });
-
-  return promise;
-};
 
 /**
  * generates a token for creating a payment method
@@ -95,27 +119,25 @@ const generateToken = customerId => {
  * @param customerId {String} customer id that the payment method belongs to
  * @param paymentMethodNonce {String} token for the payment method
  */
-const createPaymentMethod = (customerId, paymentMethodNonce) => {
-  const { promise, resolve, reject } = $q.defer();
-  const params = {
-    customerId,
-    paymentMethodNonce
-  };
+const createPaymentMethod = async (customerId, paymentMethodNonce) =>
+  new Promise((resolve, reject) => {
+    const params = {
+      customerId,
+      paymentMethodNonce
+    };
 
-  gateway.paymentMethod.create(params, (err, result) => {
-    if (err) {
-      error('Error creating payment method.', err);
-      return reject(new ServerError(err));
-    } else if (!result.success) {
-      error('Failed to create payment method.', result);
-      return reject(new ServerError('Error creating payment method.'));
-    }
+    gateway.paymentMethod.create(params, (err, result) => {
+      if (err) {
+        error('Error creating payment method.', err, '');
+        return reject(new ServerError(err));
+      } else if (!result.success) {
+        error('Failed to create payment method.', result, '');
+        return reject(new ServerError('Error creating payment method.'));
+      }
 
-    return resolve(result);
+      return resolve(result);
+    });
   });
-
-  return promise;
-};
 
 /**
  * used to find a payment method by its token

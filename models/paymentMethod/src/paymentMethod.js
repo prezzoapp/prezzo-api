@@ -19,6 +19,7 @@ const PaymentMethod = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
+      'braintree-paypal',
       'braintree-visa',
       'braintree-mastercard',
       'braintree-amex',

@@ -60,6 +60,9 @@ const User = new mongoose.Schema({
   city: {
     type: String
   },
+  braintreeCustomerId: {
+    type: String
+  },
   isSubscribedToPromotions: {
     type: Boolean,
     default: true

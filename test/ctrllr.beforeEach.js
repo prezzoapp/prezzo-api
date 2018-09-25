@@ -16,6 +16,7 @@ let HoursOfOperation;
 let Menu;
 let MenuCategory;
 let MenuItem;
+let $braintree;
 
 const initialize = async () => {
   await configLoader.init();
@@ -28,6 +29,8 @@ const initialize = async () => {
   Menu = require(baseDir + '/models/menu').default;
   MenuCategory = require(baseDir + '/models/MenuCategory').default;
   MenuItem = require(baseDir + '/models/menuItem').default;
+
+  $braintree = require(baseDir + '/services/braintree');
 };
 
 initialize();
@@ -767,6 +770,30 @@ module.exports = [
         return resolve(doc);
       });
     });
+
+    return promise;
+  },
+
+  // set `braintreeCustomerId` on `user-0`
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+
+    user
+      .generateBraintreeCustomerId()
+      .then(updatedUser => {
+        store.set('user-0', updatedUser);
+        return resolve();
+      })
+      .catch(err => {
+        console.error(
+          'Error generating braintreeCustomerId for `user-0` in `ctrllr.beforeEach`!',
+          err
+        );
+
+        return reject(err);
+      });
 
     return promise;
   }

@@ -22,6 +22,7 @@
   "dependencies": {
     "alfred": "git://github.com/ishmaelthedestroyer/alfred#alfred",
     "babel-plugin-transform-runtime": "^6.23.0",
+    "braintree": "^2.12.0",
     "cities": "^1.1.2",
     "crypto-js": "^3.1.9-1",
     "geocoder": "^0.2.3",
