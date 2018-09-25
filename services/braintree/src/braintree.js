@@ -93,7 +93,7 @@ const createCustomer = user =>
  * @param customerId
  * @returns {$q.promise}
  */
-const generateToken = customerId => {
+const generateClientToken = customerId => {
   const { promise, resolve, reject } = $q.defer();
   const params = {};
 
@@ -328,7 +328,7 @@ export {
   braintree,
   getConfig,
   createCustomer,
-  generateToken,
+  generateClientToken,
   createPaymentMethod,
   findPaymentMethod,
   deletePaymentMethod,
