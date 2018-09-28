@@ -78,27 +78,7 @@ module.exports = {
         token: data.paymentMethod.token
       };
 
-      // get the card type
-      if (data.creditCard) {
-        params.type = `braintree-${(
-          data.creditCard.cardType || 'card'
-        ).toLowerCase()}`;
-        params.readableIdentifier =
-          data.creditCard.last4 ||
-          data.creditCard.lastFour ||
-          data.creditCard.maskedNumber;
-      } else if (data.paypalAccount) {
-        params.type = 'braintree-paypal';
-        params.readableIdentifier = `braintree-${(
-          data.paypalAccount.email ||
-          data.paymentMethod.email ||
-          req.user.email
-        ).toLowerCase()}`;
-      } else {
-        throw new ServerError('Unknown card type.');
-      }
-
-      const paymentMethod = await createPaymentMethod(params);
+      const paymentMethod = await createPaymentMethod(params, data, req.user);
 
       // make this card the default credit card
       // sets `isDefault` on all of the user's cards to false

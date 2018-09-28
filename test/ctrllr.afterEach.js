@@ -9,6 +9,7 @@ import Resource from '../models/resource';
 import Location from '../models/location';
 import Vendor from '../models/vendor';
 import Menu from '../models/menu';
+import PaymentMethod from '../models/paymentMethod';
 
 /* ==========================================================================
  Helper functions
@@ -105,6 +106,22 @@ module.exports = [
     const deferred = $q.defer();
 
     Menu.remove(() => {
+      deferred.resolve('resolved!');
+    });
+
+    return deferred.promise;
+  },
+
+  /**
+   * clear all payment methods from database
+   * @param ctrllr {CTRLLR} CTRLLR instance
+   * @param response {Object} response object of request
+   * @returns {*}
+   */
+  () => {
+    const deferred = $q.defer();
+
+    PaymentMethod.remove(() => {
       deferred.resolve('resolved!');
     });
 

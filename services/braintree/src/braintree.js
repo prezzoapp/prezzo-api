@@ -121,6 +121,8 @@ const generateClientToken = customerId => {
  */
 const createPaymentMethod = async (customerId, paymentMethodNonce) =>
   new Promise((resolve, reject) => {
+    debug('createPaymentMethod()');
+
     const params = {
       customerId,
       paymentMethodNonce
@@ -135,9 +137,40 @@ const createPaymentMethod = async (customerId, paymentMethodNonce) =>
         return reject(new ServerError('Error creating payment method.'));
       }
 
+      debug('resolving createPaymentMethod()');
       return resolve(result);
     });
   });
+
+/**
+ * sets the payment method's type and identifier
+ * @returns {PaymentMethod}
+ */
+const setPaymentMethodTypeAndIdentifier = (
+  paymentMethod,
+  braintreePaymentMethod,
+  user
+) => {
+  // get the card type
+  if (braintreePaymentMethod.creditCard) {
+    paymentMethod.type = `braintree-${(
+      braintreePaymentMethod.creditCard.cardType || 'card'
+    ).toLowerCase()}`;
+    paymentMethod.readableIdentifier =
+      braintreePaymentMethod.creditCard.last4 ||
+      braintreePaymentMethod.creditCard.lastFour ||
+      braintreePaymentMethod.creditCard.maskedNumber;
+  } else if (braintreePaymentMethod.paypalAccount) {
+    paymentMethod.type = 'braintree-paypal';
+    paymentMethod.readableIdentifier = `braintree-${(
+      braintreePaymentMethod.paypalAccount.email ||
+      braintreePaymentMethod.paymentMethod.email ||
+      user.email
+    ).toLowerCase()}`;
+  } else {
+    throw new Error('Unknown card type.');
+  }
+};
 
 /**
  * used to find a payment method by its token
@@ -330,6 +363,7 @@ export {
   createCustomer,
   generateClientToken,
   createPaymentMethod,
+  setPaymentMethodTypeAndIdentifier,
   findPaymentMethod,
   deletePaymentMethod,
   createTransaction,

@@ -1,12 +1,25 @@
 // @flow
 import { ServerError } from 'alfred/core/errors';
+import { setPaymentMethodTypeAndIdentifier } from '../../services/braintree';
 
 const PaymentMethod = require('../../services/mongo').registerModel(
   __dirname,
   'PaymentMethod'
 );
 
-export const createPaymentMethod = params => new PaymentMethod(params).save();
+export const createPaymentMethod = async (
+  params,
+  braintreePaymentMethod,
+  user
+) => {
+  const paymentMethod = new PaymentMethod(params);
+  await setPaymentMethodTypeAndIdentifier(
+    paymentMethod,
+    braintreePaymentMethod,
+    user
+  );
+  return paymentMethod.save();
+};
 
 export const makeDefault = () => {
   const alias = this;
@@ -54,5 +67,16 @@ export const makeDefault = () => {
       .catch(reject);
   });
 };
+
+export const listPaymentMethods = params =>
+  new Promise((resolve, reject) => {
+    PaymentMethod.find(params, (err, paymentMethods) => {
+      if (err) {
+        return reject(new ServerError(err));
+      }
+
+      return resolve(paymentMethods);
+    });
+  });
 
 export default PaymentMethod;

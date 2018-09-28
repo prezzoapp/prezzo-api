@@ -1,7 +1,7 @@
 // @flow
 import $q from 'q';
 import mongoose from 'mongoose';
-import log from 'alfred/services/logger';
+import { debug, error } from 'alfred/services/logger';
 import { random, uuid, getNumberInRange } from 'alfred/services/util';
 import configLoader from 'alfred/services/configLoader';
 import categories from '../models/vendor/config/categories';
@@ -16,6 +16,7 @@ let HoursOfOperation;
 let Menu;
 let MenuCategory;
 let MenuItem;
+let PaymentMethod;
 let $braintree;
 
 const initialize = async () => {
@@ -29,6 +30,7 @@ const initialize = async () => {
   Menu = require(baseDir + '/models/menu').default;
   MenuCategory = require(baseDir + '/models/MenuCategory').default;
   MenuItem = require(baseDir + '/models/menuItem').default;
+  PaymentMethod = require(baseDir + '/models/paymentMethod').default;
 
   $braintree = require(baseDir + '/services/braintree');
 };
@@ -250,6 +252,47 @@ function createMenu() {
           )
         })
     )
+  });
+}
+
+/**
+ * creates a generic PaymentMethod
+ * @returns {PaymentMethod}
+ */
+function createPaymentMethod() {
+  return new PaymentMethod();
+}
+
+/**
+ * creates a generic menu
+ * @return {PaymentMethod}
+ */
+function configAndSavePaymentMethod(paymentMethod, braintreeToken, user) {
+  debug('configAndSavePaymentMethod()');
+  return new Promise(async (resolve, reject) => {
+    const result = await $braintree.createPaymentMethod(
+      user.braintreeCustomerId,
+      braintreeToken
+    );
+
+    paymentMethod.creator = user._id;
+    paymentMethod.token = result.paymentMethod.token;
+    $braintree.setPaymentMethodTypeAndIdentifier(
+      paymentMethod,
+      result,
+      user
+    );
+
+    debug('saving payment method');
+    paymentMethod.save((err, doc) => {
+      if (err) {
+        error('error saving payment method', err, '');
+        return reject(err);
+      }
+
+      debug('resolving configAndSavePaymentMethod()');
+      return resolve(doc);
+    });
   });
 }
 
@@ -792,6 +835,148 @@ module.exports = [
           err
         );
 
+        return reject(err);
+      });
+
+    return promise;
+  },
+
+  // set `braintreeCustomerId` on `user-1`
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+
+    user
+      .generateBraintreeCustomerId()
+      .then(updatedUser => {
+        store.set('user-1', updatedUser);
+        return resolve();
+      })
+      .catch(err => {
+        console.error(
+          'Error generating braintreeCustomerId for `user-1` in `ctrllr.beforeEach`!',
+          err
+        );
+
+        return reject(err);
+      });
+
+    return promise;
+  },
+
+  // set `braintreeCustomerId` on `user-1`
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+
+    user
+      .generateBraintreeCustomerId()
+      .then(updatedUser => {
+        store.set('user-1', updatedUser);
+        return resolve();
+      })
+      .catch(err => {
+        console.error(
+          'Error generating braintreeCustomerId for `user-1` in `ctrllr.beforeEach`!',
+          err
+        );
+
+        return reject(err);
+      });
+
+    return promise;
+  },
+
+  // create `paymentMethod-0`, set `user-0` as creator, set as default
+  ctrllr => {
+    debug('creating `paymentMethod-0`');
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const paymentMethod = createPaymentMethod();
+    const token = $braintree.braintree.Test.Nonces.Transactable;
+
+    paymentMethod.isDefault = true;
+    configAndSavePaymentMethod(paymentMethod, token, user)
+      .then(doc => {
+        // save to data store, resolved async function
+        store.set('paymentMethod-0', doc);
+        return resolve(doc);
+      })
+      .catch(err => {
+        error('Error creating `paymentMethod-0` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      });
+
+    return promise;
+  },
+
+  // create `paymentMethod-1`, set `user-0` as creator
+  ctrllr => {
+    debug('creating `paymentMethod-1`');
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const paymentMethod = createPaymentMethod();
+    const token = $braintree.braintree.Test.Nonces.Transactable;
+
+    configAndSavePaymentMethod(paymentMethod, token, user)
+      .then(doc => {
+        // save to data store, resolved async function
+        store.set('paymentMethod-1', doc);
+        return resolve(doc);
+      })
+      .catch(err => {
+        error('Error creating `paymentMethod-1` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      });
+
+    return promise;
+  },
+
+  // create `paymentMethod-2`, set `user-1` as creator, set as default
+  ctrllr => {
+    debug('creating `paymentMethod-2`');
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const paymentMethod = createPaymentMethod();
+    const token = $braintree.braintree.Test.Nonces.Transactable;
+
+    paymentMethod.isDefault = true;
+    configAndSavePaymentMethod(paymentMethod, token, user)
+      .then(doc => {
+        // save to data store, resolved async function
+        store.set('paymentMethod-2', doc);
+        return resolve(doc);
+      })
+      .catch(err => {
+        error('Error creating `paymentMethod-2` in `ctrllr.beforeEach`!', err);
+        return reject(err);
+      });
+
+    return promise;
+  },
+
+  // create `paymentMethod-3`, set `user-1` as creator
+  ctrllr => {
+    debug('creating `paymentMethod-3`');
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const paymentMethod = createPaymentMethod();
+    const token = $braintree.braintree.Test.Nonces.Transactable;
+
+    configAndSavePaymentMethod(paymentMethod, token, user)
+      .then(doc => {
+        // save to data store, resolved async function
+        store.set('paymentMethod-3', doc);
+        return resolve(doc);
+      })
+      .catch(err => {
+        error('Error creating `paymentMethod-3` in `ctrllr.beforeEach`!', err);
         return reject(err);
       });
 
