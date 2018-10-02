@@ -1,5 +1,5 @@
 // @flow
-import { ServerError } from 'alfred/core/errors';
+import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
 import { setPaymentMethodTypeAndIdentifier } from '../../services/braintree';
 
 const PaymentMethod = require('../../services/mongo').registerModel(
@@ -20,6 +20,35 @@ export const createPaymentMethod = async (
   );
   return paymentMethod.save();
 };
+
+export const findPaymentMethodById = (id: string) =>
+  new Promise((resolve, reject) => {
+    PaymentMethod.findById(id, (err, paymentMethod) => {
+      if (err) {
+        return reject(new ServerError(err));
+      } else if (!paymentMethod) {
+        return reject(
+          new ResourceNotFoundError(
+            `Unable to find paynemt method with id: ${id}`
+          )
+        );
+      }
+
+      return resolve(paymentMethod);
+    });
+  });
+
+export const deletePaymentMethod = paymentMethod =>
+  new Promise((resolve, reject) => {
+    const { _id } = paymentMethod;
+    PaymentMethod.remove({ _id }, err => {
+      if (err) {
+        return reject(new ServerError(err));
+      }
+
+      return resolve();
+    });
+  });
 
 export const makeDefault = () => {
   const alias = this;
