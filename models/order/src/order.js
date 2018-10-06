@@ -29,9 +29,9 @@ const Order = new mongoose.Schema({
     enum: ['pending', 'preparing', 'active', 'denied', 'complete'],
     required: true
   },
-  orderType: {
+  type: {
     type: String,
-    enum: ['deliver', 'table'],
+    enum: ['delivery', 'table'],
     required: true
   },
   paymentType: {

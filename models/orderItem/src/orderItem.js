@@ -8,14 +8,26 @@ const OrderItem = new mongoose.Schema({
     default: Date.now
   },
   item: MenuItem.schema,
-  notes: {
+  title: {
     type: String,
     required: true,
     trim: true
   },
+  description: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  notes: {
+    type: String,
+    trim: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
   rating: {
     type: Number,
-    required: true,
     min: 1,
     max: 5
   },
