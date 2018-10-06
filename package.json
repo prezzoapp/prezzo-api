@@ -13,7 +13,8 @@
     "doc": "npm run build && cd build && grunt doc",
     "doc:api": "npm run build && cd build && grunt doc:api",
     "doc:models": "npm run build && cd build && grunt doc:models",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "deploy": "git push origin master && git push team master && git push heroku master"
   },
   "repository": "git@github.com:odotan/prezzo-api.git",
   "author": "ishmaelthedestroyer",
