@@ -15,3 +15,5 @@ export const createOrder = params =>
       items: params.items.map(item => new OrderItem(item))
     })
   ).save();
+
+export const listOrders = params => Order.find(params);

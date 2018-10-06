@@ -17,6 +17,8 @@ let Menu;
 let MenuCategory;
 let MenuItem;
 let PaymentMethod;
+let Order;
+let OrderItem;
 let $braintree;
 
 const initialize = async () => {
@@ -31,6 +33,8 @@ const initialize = async () => {
   MenuCategory = require(baseDir + '/models/MenuCategory').default;
   MenuItem = require(baseDir + '/models/menuItem').default;
   PaymentMethod = require(baseDir + '/models/paymentMethod').default;
+  Order = require(baseDir + '/models/order').default;
+  OrderItem = require(baseDir + '/models/orderItem').default;
 
   $braintree = require(baseDir + '/services/braintree');
 };
@@ -293,6 +297,45 @@ function configAndSavePaymentMethod(paymentMethod, braintreeToken, user) {
       debug('resolving configAndSavePaymentMethod()');
       return resolve(doc);
     });
+  });
+}
+
+/**
+ * creates a generic Order
+ * @returns {Order}
+ */
+function createOrder() {
+  return new Order({
+    status: 'pending',
+    readableIdentifier: getNumberInRange(1000, 9999),
+    type: 'table',
+    paymentType: 'cash',
+    items: [
+      {
+        title: random(10),
+        description: random(50),
+        price: parseFloat(
+          `${getNumberInRange(0, 99)}.${getNumberInRange(11, 99)}`
+        ),
+        notes: random(50)
+      },
+      {
+        title: random(10),
+        description: random(50),
+        price: parseFloat(
+          `${getNumberInRange(0, 99)}.${getNumberInRange(11, 99)}`
+        ),
+        notes: random(50)
+      },
+      {
+        title: random(10),
+        description: random(50),
+        price: parseFloat(
+          `${getNumberInRange(0, 99)}.${getNumberInRange(11, 99)}`
+        ),
+        notes: random(50)
+      }
+    ].map(item => new OrderItem(item))
   });
 }
 
@@ -979,6 +1022,112 @@ module.exports = [
         error('Error creating `paymentMethod-3` in `ctrllr.beforeEach`!', err);
         return reject(err);
       });
+
+    return promise;
+  },
+
+  // create `order-0`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const vendor = store.get('vendor-1');
+    const order = createOrder();
+
+    order.creator = user;
+    order.vendor = vendor;
+    order.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `order-0` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('order-0', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `order-1`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-0');
+    const vendor = store.get('vendor-2');
+    const order = createOrder();
+
+    order.creator = user;
+    order.vendor = vendor;
+    order.type = 'delivery';
+    order.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `order-1` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('order-1', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `order-2`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const vendor = store.get('vendor-1');
+    const order = createOrder();
+
+    order.creator = user;
+    order.vendor = vendor;
+    order.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `order-2` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('order-2', doc);
+      return resolve(doc);
+    });
+
+    return promise;
+  },
+
+  // create `order-3`,
+  ctrllr => {
+    const { promise, resolve, reject } = $q.defer();
+    const store = ctrllr.getStore();
+    const user = store.get('user-1');
+    const vendor = store.get('vendor-2');
+    const order = createOrder();
+
+    order.creator = user;
+    order.vendor = vendor;
+    order.type = 'delivery';
+    order.save((err, doc) => {
+      if (err) {
+        console.error(
+          'Error creating `order-3` in `ctrllr.beforeEach`!',
+          err
+        );
+        return reject(err);
+      }
+
+      store.set('order-3', doc);
+      return resolve(doc);
+    });
 
     return promise;
   }

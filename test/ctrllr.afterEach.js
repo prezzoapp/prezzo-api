@@ -10,6 +10,8 @@ import Location from '../models/location';
 import Vendor from '../models/vendor';
 import Menu from '../models/menu';
 import PaymentMethod from '../models/paymentMethod';
+import Order from '../models/order';
+import OrderItem from '../models/orderItem';
 
 /* ==========================================================================
  Helper functions
@@ -122,6 +124,38 @@ module.exports = [
     const deferred = $q.defer();
 
     PaymentMethod.remove(() => {
+      deferred.resolve('resolved!');
+    });
+
+    return deferred.promise;
+  },
+
+  /**
+   * clear all orders from database
+   * @param ctrllr {CTRLLR} CTRLLR instance
+   * @param response {Object} response object of request
+   * @returns {*}
+   */
+  () => {
+    const deferred = $q.defer();
+
+    Order.remove(() => {
+      deferred.resolve('resolved!');
+    });
+
+    return deferred.promise;
+  },
+
+  /**
+   * clear all order items from database
+   * @param ctrllr {CTRLLR} CTRLLR instance
+   * @param response {Object} response object of request
+   * @returns {*}
+   */
+  () => {
+    const deferred = $q.defer();
+
+    OrderItem.remove(() => {
       deferred.resolve('resolved!');
     });
 
