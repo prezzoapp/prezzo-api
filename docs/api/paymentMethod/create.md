@@ -8,6 +8,8 @@ Parameters
   
 **Body**  
   
+- *isDefault*  
+  - type: `boolean`  
 - *nonce*  
   - type: `string`  
   - REQUIRED  
@@ -24,3 +26,4 @@ Specifications
 - should set a braintree customer id on the user if they don't have one  
 - should NOT update the user's braintree customer id if they have one  
 - should make the payment method the user's default payment method  
+- should NOT make the payment method the user's default payment method if `isDefault` isn't sent  

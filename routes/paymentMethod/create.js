@@ -13,6 +13,9 @@ module.exports = {
   method: 'POST',
   config: {
     body: {
+      isDefault: {
+        type: 'boolean'
+      },
       nonce: {
         type: 'string',
         required: true
@@ -74,7 +77,7 @@ module.exports = {
       const creator = req.user._id;
       const params = {
         creator,
-        isDefault: true,
+        isDefault: req.body.isDefault === true,
         token: data.paymentMethod.token
       };
 
@@ -83,7 +86,9 @@ module.exports = {
       // make this card the default credit card
       // sets `isDefault` on all of the user's cards to false
       // sets `isDefault` to this card to true if set to false
-      await paymentMethod.makeDefault();
+      if (req.body && req.body.isDefault === true) {
+        await paymentMethod.makeDefault();
+      }
 
       // return new payment method info to client
       res.$end(paymentMethod);

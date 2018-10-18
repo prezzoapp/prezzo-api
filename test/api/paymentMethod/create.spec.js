@@ -1,4 +1,5 @@
 const getPayload = () => ({
+  isDefault: true,
   nonce: 'fake-valid-visa-nonce'
 });
 
@@ -54,7 +55,7 @@ module.exports = [
       $model: 'user',
       $_id: '{{ user-2._id }}',
       $values: {
-        braintreeCustomerId: value => value && value.length
+        braintreeCustomerId: value => value && value.length === 4
       }
     }
   },
@@ -127,6 +128,58 @@ module.exports = [
         $_id: '{{ paymentMethod-0 }}',
         $values: {
           isDefault: false
+        }
+      },
+      {
+        $model: 'paymentMethod',
+        $_id: '{{ paymentMethod-1 }}',
+        $values: {
+          isDefault: false
+        }
+      }
+    ]
+  },
+  {
+    description:
+      "should NOT make the payment method the user's default payment method if `isDefault` isn't sent",
+    url: '/v1/payment-methods',
+    $$basicAuth: 'user-0',
+    method: 'POST',
+    $$send: () => {
+      const payload = getPayload();
+      delete payload.isDefault;
+      return payload;
+    },
+    expectStatus: 200,
+    expectKeys: [
+      '_id',
+      'createdDate',
+      'creator',
+      'isDefault',
+      'readableIdentifier',
+      'type',
+      'token'
+    ],
+    $$expectKeyValue: {
+      creator: '{{ user-0._id }}',
+      isDefault: false,
+      type: /braintree-[a-z]+/,
+      readableIdentifier: value => value && value.length === 4
+    },
+    $$reloadStore: true,
+    $$assertModel: [
+      {
+        $model: 'paymentMethod',
+        $_id: '{{ __RESPONSE__.body._id }}',
+        $values: {
+          isDefault: false
+        }
+      },
+      {
+        $model: 'paymentMethod',
+        $_id: '{{ paymentMethod-0 }}',
+        $values: {
+          isDefault: true
         }
       },
       {
