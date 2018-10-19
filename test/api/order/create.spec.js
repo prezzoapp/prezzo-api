@@ -12,7 +12,8 @@ const getPayload = ctrllr => ({
       price: parseFloat(
         `${getNumberInRange(0, 99)}.${getNumberInRange(11, 99)}`
       ),
-      notes: random(50)
+      notes: random(50),
+      imageURLs: [10, 10, 10].map(n => `http://prezzo.io/img-${random(n)}.jpg`)
     },
     {
       title: random(10),
@@ -20,7 +21,8 @@ const getPayload = ctrllr => ({
       price: parseFloat(
         `${getNumberInRange(0, 99)}.${getNumberInRange(11, 99)}`
       ),
-      notes: random(50)
+      notes: random(50),
+      imageURLs: [10, 10, 10].map(n => `http://prezzo.io/img-${random(n)}.jpg`)
     },
     {
       title: random(10),
@@ -28,7 +30,8 @@ const getPayload = ctrllr => ({
       price: parseFloat(
         `${getNumberInRange(0, 99)}.${getNumberInRange(11, 99)}`
       ),
-      notes: random(50)
+      notes: random(50),
+      imageURLs: [10, 10, 10].map(n => `http://prezzo.io/img-${random(n)}.jpg`)
     }
   ]
 });
