@@ -1,6 +1,6 @@
 // @flow
 import type { $Request, $Response } from 'express';
-import { isObjectId } from 'alfred/services/util';
+import { isObjectId, extend } from 'alfred/services/util';
 import { ServerError } from 'alfred/core/errors';
 import { debug, warn } from 'alfred/services/logger';
 import { createOrder } from '../../models/order';
@@ -49,9 +49,9 @@ module.exports = {
   },
   async run(req: $Request, res: $Response) {
     try {
-      debug('req.data', req.data, '');
+      debug('req.body', req.body, '');
       const order = await createOrder(
-        Object.assign({}, req.body, {
+        extend({}, req.body, {
           creator: req.user
         })
       );
