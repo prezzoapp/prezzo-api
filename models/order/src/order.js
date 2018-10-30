@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import OrderItem from '../../../models/orderItem';
 
 const { ObjectId } = mongoose.Schema.Types;
+const STATUSES = ['pending', 'preparing', 'active', 'denied', 'complete'];
 const Order = new mongoose.Schema({
   createdDate: {
     type: Date,
@@ -26,7 +27,7 @@ const Order = new mongoose.Schema({
   items: [OrderItem.schema],
   status: {
     type: String,
-    enum: ['pending', 'preparing', 'active', 'denied', 'complete'],
+    enum: STATUSES,
     required: true
   },
   type: {
@@ -46,3 +47,4 @@ const Order = new mongoose.Schema({
 });
 
 module.exports = Order;
+exports.STATUSES = STATUSES;
