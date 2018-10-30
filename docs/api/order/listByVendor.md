@@ -30,3 +30,4 @@ Specifications
 - should only return orders of type `delivery` when specifying `type=delivery`  
 - should only return orders of status `preparing` when specifying `status=preparing`  
 - should only return orders of status `active` when specifying `status=active`  
+- should only return orders of status `complete` when specifying `status=complete`  

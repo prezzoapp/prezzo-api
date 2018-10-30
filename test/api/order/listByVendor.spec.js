@@ -18,6 +18,7 @@ const getModifyModelQuery = () => ({
 // should only return orders of type `delivery` when specifying `type=delivery`
 // should only return orders of status `preparing` when specifying `status=preparing`
 // should only return orders of status `active` when specifying `status=active`
+// should only return orders of status `complete` when specifying `status=complete`
 
 module.exports = [
   {
@@ -218,6 +219,55 @@ module.exports = [
     expectArray: true,
     $$expectAll: {
       'should have `status` set to `active`': value => value.status === 'active'
+    },
+    $$expectInArray: {
+      'should have returned `order-2`': (value, ctrllr) =>
+        value &&
+        value._id ===
+          ctrllr
+            .getStore()
+            .get('order-2')
+            ._id.toString()
+    },
+    $$expectNone: {
+      'should NOT have returned `order-0`': (value, ctrllr) =>
+        value &&
+        value._id ===
+          ctrllr
+            .getStore()
+            .get('order-0')
+            ._id.toString(),
+      'should NOT have returned `order-1`': (value, ctrllr) =>
+        value &&
+        value._id ===
+          ctrllr
+            .getStore()
+            .get('order-1')
+            ._id.toString(),
+      'should NOT have returned `order-3`': (value, ctrllr) =>
+        value &&
+        value._id ===
+          ctrllr
+            .getStore()
+            .get('order-3')
+            ._id.toString()
+      }
+  },
+  {
+    description:
+      'should only return orders of status `complete` when specifying `status=complete`',
+    $$url: '/v1/vendors/{{ vendor-1._id }}/orders?status=complete',
+    method: 'GET',
+    $$basicAuth: 'user-0',
+    $$modifyModel: extend(getModifyModelQuery(), {
+      $update: {
+        status: 'complete'
+      }
+    }),
+    expectStatus: 200,
+    expectArray: true,
+    $$expectAll: {
+      'should have `status` set to `complete`': value => value.status === 'complete'
     },
     $$expectInArray: {
       'should have returned `order-2`': (value, ctrllr) =>
