@@ -1,9 +1,10 @@
 // @flow
 import type { $Request, $Response } from 'express';
 import { isObjectId, extend } from 'alfred/services/util';
-import { ServerError } from 'alfred/core/errors';
+import { ForbiddenError } from 'alfred/core/errors';
 import { debug, warn } from 'alfred/services/logger';
-import { createOrder } from '../../models/order';
+import $q from 'q';
+import { createOrder, checkPendingOrders } from '../../models/order';
 
 module.exports = {
   description: 'Creates an order.',
@@ -26,6 +27,10 @@ module.exports = {
           return true;
         }
       },
+      status: {
+        type: 'string',
+        required: true
+      },
       type: {
         type: 'string',
         required: true,
@@ -47,18 +52,35 @@ module.exports = {
       }
     }
   },
+  validate: [
+    req => {
+      const { promise, resolve, reject } = $q.defer();
+      const { user } = req;
+      const { status } = req.body;
+
+      checkPendingOrders(user, status).then(result => {
+        if (result) {
+          reject(new ForbiddenError('You already have an open order.'));
+        }
+        resolve();
+      });
+
+      return promise;
+    }
+  ],
   async run(req: $Request, res: $Response) {
     try {
-      debug('req.body', req.body, '');
       const order = await createOrder(
         extend({}, req.body, {
           creator: req.user
         })
       );
+
+      debug('order: ', order, '');
       res.$end(order);
     } catch (e) {
       warn('Failed to create order.', e);
-      res.$fail(new ServerError(e));
+      res.$fail(e);
     }
   }
 };

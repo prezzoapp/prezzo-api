@@ -50,6 +50,7 @@ export const findAndUpdateUser = (query: any = {}, update: any = {}) => {
 
   User.findOneAndUpdate(query, update, { new: true }, (err, user) => {
     if (err) {
+      console.log(err);
       return reject(new ServerError(err));
     } else if (!user) {
       return reject(new ResourceNotFoundError('That user doesnt exist.'));

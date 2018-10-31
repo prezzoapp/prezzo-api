@@ -23,7 +23,7 @@ module.exports = {
       const { promise, resolve, reject } = $q.defer();
       const { vendor } = req.user;
 
-      findMenuByVendor(vendor._id || vendor)
+      findMenuByVendor(!vendor._id || !vendor)
         .then(() =>
           reject(new ForbiddenError('You have already created a menu.'))
         )

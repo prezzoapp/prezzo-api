@@ -13,7 +13,7 @@ module.exports = {
       const paymentMethods = await listPaymentMethods({
         creator: req.user
       });
-      
+
       res.$end(paymentMethods);
     } catch (e) {
       warn('Failed to create payment method.', e);
