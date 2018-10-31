@@ -3,6 +3,7 @@ import type { $Request, $Response } from 'express';
 import { ServerError } from 'alfred/core/errors';
 import { warn } from 'alfred/services/logger';
 import { listOrders } from '../../models/order';
+import { STATUSES } from '../../models/order/src/order';
 
 module.exports = {
   description: 'Returns a vendors orders.',
@@ -13,6 +14,10 @@ module.exports = {
       type: {
         type: 'string',
         enum: ['delivery', 'table']
+      },
+      status: {
+        type: 'string',
+        enum: STATUSES
       }
     }
   },
@@ -22,6 +27,10 @@ module.exports = {
 
       if (req.query && req.query.type) {
         params.type = req.query.type;
+      }
+
+      if (req.query && req.query.status) {
+        params.status = req.query.status;
       }
 
       const orders = await listOrders(params);

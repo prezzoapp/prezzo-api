@@ -17,6 +17,8 @@ Parameters
   - enum  
     - delivery  
     - table  
+- *status*  
+  - type: `string`  
   
 Specifications  
 --------------  
@@ -26,3 +28,6 @@ Specifications
 - should return the vendor's orders  
 - should only return orders of type `table` when specifying `type=table`  
 - should only return orders of type `delivery` when specifying `type=delivery`  
+- should only return orders of status `preparing` when specifying `status=preparing`  
+- should only return orders of status `active` when specifying `status=active`  
+- should only return orders of status `complete` when specifying `status=complete`  
