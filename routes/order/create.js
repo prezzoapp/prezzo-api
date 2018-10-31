@@ -27,10 +27,10 @@ module.exports = {
           return true;
         }
       },
-      status: {
-        type: 'string',
-        required: true
-      },
+      // status: {
+      //   type: 'string',
+      //   required: true
+      // },
       type: {
         type: 'string',
         required: true,
