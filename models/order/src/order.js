@@ -11,8 +11,7 @@ const Order = new mongoose.Schema({
   },
   creator: {
     type: ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
   },
   vendor: {
     type: ObjectId,

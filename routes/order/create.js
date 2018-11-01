@@ -69,6 +69,7 @@ module.exports = {
     }
   ],
   async run(req: $Request, res: $Response) {
+    debug('Req User: ', req.user, '');
     try {
       const order = await createOrder(
         extend({}, req.body, {

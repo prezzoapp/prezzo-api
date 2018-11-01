@@ -5,6 +5,8 @@ import $q from 'q';
 
 import { debug } from 'alfred/services/logger';
 
+import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
+
 import OrderItem from '../../models/orderItem';
 
 const Order = require('../../services/mongo').registerModel(__dirname, 'Order');
@@ -58,11 +60,20 @@ export function approveDenyOrder(orderId, vendorId, status) {
       } else if (!updatedOrder) {
         return reject(new Error('no updated order found'));
       }
-      return resolve(Order.find({ vendor: vendorId }));
+      return resolve(null);
     }
   );
+}
+
+export const listOrders = params => {
+  const { promise, resolve, reject } = $q.defer();
+
+  Order.find(params).populate('creator').exec((err, orders) => {
+    if(err) {
+      return reject(new ServerError(err));
+    }
+    return resolve(orders);
+  });
 
   return promise;
 }
-
-export const listOrders = params => Order.find(params);

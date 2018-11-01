@@ -15,7 +15,7 @@ module.exports = {
       status: {
         type: 'string',
         required: true,
-        enum: ['pending', 'active']
+        enum: ['pending', 'active', 'denied']
       }
     }
   },
@@ -41,14 +41,14 @@ module.exports = {
     const vendorId = req.user.vendor;
 
     try {
-      const updatedOrder = await approveDenyOrder(
+      await approveDenyOrder(
         orderId,
         vendorId,
         req.body.status
       );
 
-      debug('orders: ', updatedOrder, '');
-      res.$end(updatedOrder);
+      //debug('orders: ', updatedOrder, '');
+      res.$end();
     } catch (e) {
       warn('Failed to create order.', e);
       res.$fail(e);
