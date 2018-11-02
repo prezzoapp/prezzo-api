@@ -4,10 +4,10 @@ import { isObjectId, extend } from 'alfred/services/util';
 import { ForbiddenError } from 'alfred/core/errors';
 import { debug, warn } from 'alfred/services/logger';
 import $q from 'q';
-import { approveDenyOrder } from '../../models/order';
+import { changeOrderStatus } from '../../models/order';
 
 module.exports = {
-  description: 'Approve / Deny an order.',
+  description: 'Change order status.',
   path: '/v1/orders/:id',
   method: 'POST',
   config: {
@@ -15,7 +15,7 @@ module.exports = {
       status: {
         type: 'string',
         required: true,
-        enum: ['pending', 'active', 'denied']
+        enum: ['pending', 'active', 'denied', 'complete']
       }
     }
   },
@@ -41,13 +41,12 @@ module.exports = {
     const vendorId = req.user.vendor;
 
     try {
-      await approveDenyOrder(
+      await changeOrderStatus(
         orderId,
         vendorId,
         req.body.status
       );
 
-      //debug('orders: ', updatedOrder, '');
       res.$end();
     } catch (e) {
       warn('Failed to create order.', e);

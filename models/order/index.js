@@ -42,7 +42,7 @@ export const checkPendingOrders = (user, orderStatus) => {
   });
 };
 
-export function approveDenyOrder(orderId, vendorId, status) {
+export function changeOrderStatus(orderId, vendorId, status) {
   const { promise, resolve, reject } = $q.defer();
 
   Order.findOneAndUpdate(
