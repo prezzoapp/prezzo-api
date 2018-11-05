@@ -87,6 +87,9 @@ export const updateVendor = (vendorId, params) => {
 export const listVendors = (params: any) => {
   const { promise, resolve, reject } = $q.defer();
 
+  console.log("Params: ");
+  console.log(params);
+
   Vendor.find(params)
     .populate('menu')
     .exec((err, vendors) => {

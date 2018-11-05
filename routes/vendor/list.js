@@ -20,13 +20,18 @@ module.exports = {
       },
       latitude: {
         type: 'string'
+      },
+      activeFilters: {
+        type: 'string'
       }
     }
   },
   async run(req: $Request, res: $Response) {
     try {
       const params = {};
-      const { name, distance, longitude, latitude } = req.query;
+      const { name, distance, longitude, latitude, activeFilters } = req.query;
+
+      //debug('wifi: ', wifi, '');
 
       if (name) {
         params.name = {
@@ -52,8 +57,12 @@ module.exports = {
         };
       }
 
+      const array = activeFilters.split(',');
+
+      params.filters = { $all: array };
+
       const vendors = await listVendors(params);
-      debug('vendors', vendors);
+      // debug('vendors', vendors);
 
       res.$end(vendors);
     } catch (e) {

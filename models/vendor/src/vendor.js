@@ -44,6 +44,9 @@ const Vendor = new mongoose.Schema({
   menu: {
     type: ObjectId,
     ref: 'Menu'
+  },
+  filters: {
+    type: Array
   }
 });
 

@@ -39,6 +39,9 @@ module.exports = {
       location: {
         required: true,
         validate: Location.validate
+      },
+      filters: {
+        isArray: true
       }
     }
   },
