@@ -23,15 +23,16 @@ module.exports = {
       },
       activeFilters: {
         type: 'string'
+      },
+      pricing: {
+        type: 'string'
       }
     }
   },
   async run(req: $Request, res: $Response) {
     try {
       const params = {};
-      const { name, distance, longitude, latitude, activeFilters } = req.query;
-
-      //debug('wifi: ', wifi, '');
+      const { name, distance, longitude, latitude, activeFilters, pricing } = req.query;
 
       if (name) {
         params.name = {
@@ -42,8 +43,6 @@ module.exports = {
 
       if (longitude && latitude) {
         const coordinates = [longitude, latitude];
-
-        // 50 miles = 80.4672 kilometers; * 1000 = 160,934 meters
         const maxDistance = parseInt(distance || (50 * 1.60934 * 1000));
 
         params['location.coordinates'] = {
@@ -57,12 +56,17 @@ module.exports = {
         };
       }
 
-      const array = activeFilters.split(',');
+      if(activeFilters) {
+        const array = activeFilters.split(',');
+        params.filters = { $all: array };
+      }
 
-      params.filters = { $all: array };
+      if(pricing) {
+        debug('Pricing: ', pricing, '');
+        params.pricing = parseInt(pricing);
+      }
 
       const vendors = await listVendors(params);
-      // debug('vendors', vendors);
 
       res.$end(vendors);
     } catch (e) {

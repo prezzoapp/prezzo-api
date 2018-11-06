@@ -40,6 +40,9 @@ module.exports = {
       },
       filters: {
         isArray: true
+      },
+      pricing: {
+        type: 'number'
       }
     }
   },

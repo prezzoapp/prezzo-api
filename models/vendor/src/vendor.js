@@ -47,6 +47,9 @@ const Vendor = new mongoose.Schema({
   },
   filters: {
     type: Array
+  },
+  pricing: {
+    type: Number
   }
 });
 
