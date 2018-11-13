@@ -56,15 +56,18 @@ module.exports = {
         };
       }
 
-      if(activeFilters) {
+      if(activeFilters && activeFilters !== '') {
         const array = activeFilters.split(',');
+        for(let index in array) {
+          if(array[index] === 'price' && pricing) {
+            params.pricing = parseInt(pricing);
+            break;
+          }
+        }
         params.filters = { $all: array };
       }
 
-      if(pricing) {
-        debug('Pricing: ', pricing, '');
-        params.pricing = parseInt(pricing);
-      }
+      debug('Params: ', params, '');
 
       const vendors = await listVendors(params);
 

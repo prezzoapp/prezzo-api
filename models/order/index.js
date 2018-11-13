@@ -68,7 +68,7 @@ export function changeOrderStatus(orderId, vendorId, status) {
 export const listOrders = params => {
   const { promise, resolve, reject } = $q.defer();
 
-  Order.find(params).populate('creator').exec((err, orders) => {
+  Order.find(params).populate('creator').populate('paymentMethod').exec((err, orders) => {
     if(err) {
       return reject(new ServerError(err));
     }
