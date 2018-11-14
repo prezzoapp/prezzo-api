@@ -1,7 +1,7 @@
 // @flow
 import type { $Request, $Response } from 'express';
 import { ServerError } from 'alfred/core/errors';
-import { warn } from 'alfred/services/logger';
+import { warn, debug } from 'alfred/services/logger';
 import { listOrders } from '../../models/order';
 
 module.exports = {
@@ -13,16 +13,26 @@ module.exports = {
       type: {
         type: 'string',
         enum: ['delivery', 'table']
+      },
+      status: {
+        type: 'string'
       }
     }
   },
   async run(req: $Request, res: $Response) {
     try {
-      const params = { creator: req.user };
+      let params = { creator: req.user._id };
 
       if (req.query && req.query.type) {
         params.type = req.query.type;
       }
+
+      if(req.query && req.query.status) {
+        if(req.query.status === 'pending')
+          params.status = {$in: ['pending', 'preparing', 'active']};
+      }
+
+      debug("Params: ", params, '');
 
       const orders = await listOrders(params);
       res.$end(orders);

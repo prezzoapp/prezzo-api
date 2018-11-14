@@ -42,11 +42,11 @@ export const checkPendingOrders = (user, orderStatus) => {
   });
 };
 
-export function changeOrderStatus(orderId, vendorId, status) {
+export function changeOrderStatus(params, status) {
   const { promise, resolve, reject } = $q.defer();
 
   Order.findOneAndUpdate(
-    { $and: [{ _id: orderId, vendor: vendorId }] },
+    { $and: [params] },
     {
       $set: {
         status

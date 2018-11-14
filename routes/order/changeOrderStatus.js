@@ -36,16 +36,16 @@ module.exports = {
   //   }
   // ],
   async run(req: $Request, res: $Response) {
-    debug('Req Body: ', req.body, '');
-    const orderId = req.params.id;
-    const vendorId = req.user.vendor;
+    const params = {};
+    if(req.params && req.params.id) {
+      params._id = req.params.id;
+    }
+    if(req.user && req.user.vendor) {
+      params.vendor = req.user.vendor;
+    }
 
     try {
-      await changeOrderStatus(
-        orderId,
-        vendorId,
-        req.body.status
-      );
+      await changeOrderStatus(params, req.body.status);
 
       res.$end();
     } catch (e) {

@@ -27,10 +27,6 @@ module.exports = {
           return true;
         }
       },
-      // status: {
-      //   type: 'string',
-      //   required: true
-      // },
       type: {
         type: 'string',
         required: true,
@@ -39,7 +35,7 @@ module.exports = {
       paymentType: {
         type: 'string',
         required: true,
-        enum: ['cash']
+        enum: ['cash', 'card']
       },
       vendor: {
         type: 'string',
@@ -47,8 +43,7 @@ module.exports = {
         validate: isObjectId
       },
       paymentMethod: {
-        type: 'string',
-        validate: isObjectId
+        type: 'string'
       }
     }
   },
