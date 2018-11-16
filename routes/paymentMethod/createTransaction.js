@@ -24,12 +24,18 @@ module.exports = {
       amount: {
         type: 'number',
         required: true
+      },
+      paymentType: {
+        type: 'string',
+        enum: ['cash', 'card']
       }
     }
   },
   async run(req: $Request, res: $Response) {
     try {
       const params = {};
+      let result;
+
       if(req.body && req.body.order) {
         params._id = req.body.order;
       }
@@ -37,16 +43,18 @@ module.exports = {
         params.vendor = req.user.vendor;
       }
 
-      const result = await createTransaction(
-        req.body.token,
-        req.body.amount
-      );
-
-      debug("Req.Body", req.body, '');
-      debug("Req.User", req.user, '');
-
-      await changeOrderStatus(params, 'complete');
-
+      if(req.body.paymentType && req.body.paymentType === 'cash' && req.body.token === '') {
+        debug("Called");
+        result = await changeOrderStatus(params, 'complete');
+      } else {
+        result = await createTransaction(
+          req.body.token,
+          req.body.amount
+        );
+        await changeOrderStatus(params, 'complete');
+        // debug("Req.Body", req.body, '');
+        // debug("Req.User", req.user, '');
+      }
       res.$end(result);
     } catch (e) {
       warn('Failed to make transaction.', e);
