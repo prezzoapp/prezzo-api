@@ -18,6 +18,11 @@ const OrderItem = new mongoose.Schema({
     required: true,
     trim: true
   },
+  status: {
+    type: String,
+    enum: ['pending', 'preparing', 'active', 'denied', 'complete'],
+    required: true
+  },
   notes: {
     type: String,
     trim: true

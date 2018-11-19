@@ -1,6 +1,7 @@
 // @flow
 import type { $Request, $Response } from 'express';
 import { debug } from 'alfred/services/logger';
+import { ServerError } from 'alfred/core/errors';
 import { listVendors } from '../../models/vendor';
 
 module.exports = {
@@ -73,7 +74,7 @@ module.exports = {
 
       res.$end(vendors);
     } catch (e) {
-      return res.$fail(e);
+      return res.$fail(new ServerError(e));
     }
   }
 };

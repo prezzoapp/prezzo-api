@@ -77,3 +77,25 @@ export const listOrders = params => {
 
   return promise;
 }
+
+export const checkStatusAndCancelItem = params => {
+  const { promise, resolve, reject } = $q.defer();
+  debug("Params: ", params, '');
+
+  Order.find({ $and: [params] }).populate('creator').populate('paymentMethod').exec((err, order) => {
+    if(err) {
+      return reject(new ServerError(err));
+    }
+    if(order.length !== 0) {
+      const itemIndex = order[0].items.findIndex(item => item._id.toString() === params['items._id']);
+      if(itemIndex !== -1) {
+        order[0].items[itemIndex].status = 'denied';
+        order[0].save();
+      }
+      return resolve(order);
+    }
+    delete params['items.status'];
+    return resolve(Order.find({ $and: [params] }));
+  });
+  return promise;
+};
