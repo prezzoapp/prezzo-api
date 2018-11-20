@@ -92,10 +92,21 @@ export const checkStatusAndCancelItem = params => {
         order[0].items[itemIndex].status = 'denied';
         order[0].save();
       }
-      return resolve(order);
+      return resolve({
+        message: "Your item has been successfully deleted.",
+        order: order
+      });
     }
     delete params['items.status'];
-    return resolve(Order.find({ $and: [params] }));
+    Order.find({ $and: [params] }, (err, result) => {
+      if(err) {
+        return reject(new ServerError(err))
+      }
+      return resolve({
+        message: "You can't delete this item.",
+        order: result
+      });
+    });
   });
   return promise;
 };

@@ -35,7 +35,7 @@ module.exports = {
       debug("Params: ", params, '');
 
       const orders = await listOrders(params);
-      res.$end(orders);
+      res.$end({ order: orders });
     } catch (e) {
       warn('Failed to create order.', e);
       res.$fail(new ServerError(e));

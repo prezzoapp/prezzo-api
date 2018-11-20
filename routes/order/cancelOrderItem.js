@@ -33,11 +33,11 @@ module.exports = {
     params['items.status'] = 'pending';
 
     try {
-      const order = await checkStatusAndCancelItem(params);
+      const { message, order } = await checkStatusAndCancelItem(params);
 
-      res.$end(order);
+      res.$end({ message: message, order: order });
     } catch (e) {
-      warn('Failed to fetch order item.', e);
+      warn('Failed to cancel order item.', e);
       res.$fail(e);
     }
   }
