@@ -44,7 +44,6 @@ module.exports = {
       }
 
       if(req.body.paymentType && req.body.paymentType === 'cash' && req.body.token === '') {
-        debug("Called");
         result = await changeOrderStatus(params, 'complete');
       } else {
         result = await createTransaction(
@@ -52,8 +51,6 @@ module.exports = {
           req.body.amount
         );
         await changeOrderStatus(params, 'complete');
-        // debug("Req.Body", req.body, '');
-        // debug("Req.User", req.user, '');
       }
       res.$end(result);
     } catch (e) {

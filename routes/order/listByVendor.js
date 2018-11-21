@@ -18,12 +18,17 @@ module.exports = {
       status: {
         type: 'string',
         enum: STATUSES
+      },
+      page: {
+        type: 'string'
       }
     }
   },
   async run(req: $Request, res: $Response) {
     try {
       const params = { vendor: req.params.id };
+
+      let page = 0;
 
       if (req.query && req.query.type) {
         params.type = req.query.type;
@@ -33,7 +38,11 @@ module.exports = {
         params.status = req.query.status;
       }
 
-      const orders = await listOrders(params);
+      if(req.query && req.query.page) {
+        page = parseInt(req.query.page);
+      }
+
+      const orders = await listOrders(params, page);
       res.$end(orders);
     } catch (e) {
       warn('Failed to create order.', e);

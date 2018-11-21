@@ -63,12 +63,15 @@ export function changeOrderStatus(params, status) {
       return resolve(null);
     }
   );
+
+  return promise;
 }
 
-export const listOrders = params => {
+export const listOrders = (params, page) => {
+  const limit = 1;
   const { promise, resolve, reject } = $q.defer();
 
-  Order.find(params).populate('creator').populate('paymentMethod').exec((err, orders) => {
+  Order.find(params).skip((page === 0) ? 0 : limit*(page-1)).limit((page === 0) ? 0 : limit).sort({ createdDate: -1 }).populate('creator').populate('paymentMethod').exec((err, orders) => {
     if(err) {
       return reject(new ServerError(err));
     }
