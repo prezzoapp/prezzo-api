@@ -65,7 +65,7 @@ export function changeOrderStatus(params, status, makeInnerChanges) {
         updatedOrder.items.map(item => {
           if(item.status === 'pending') {
             item.status = 'denied';
-          } else if(item.status !== 'pending' || item.status !== 'denied') {
+          } else if(item.status !== 'pending' && item.status !== 'denied') {
             item.status = 'complete';
           }
         });
