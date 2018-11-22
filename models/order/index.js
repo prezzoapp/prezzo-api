@@ -42,7 +42,7 @@ export const checkPendingOrders = (user, orderStatus) => {
   });
 };
 
-export function changeOrderStatus(params, status) {
+export function changeOrderStatus(params, status, makeInnerChanges) {
   const { promise, resolve, reject } = $q.defer();
 
   Order.findOneAndUpdate(
@@ -60,6 +60,19 @@ export function changeOrderStatus(params, status) {
       } else if (!updatedOrder) {
         return reject(new Error('no updated order found'));
       }
+
+      if(makeInnerChanges) {
+        updatedOrder.items.map(item => {
+          if(item.status === 'pending') {
+            item.status = 'denied';
+          } else if(item.status !== 'pending' || item.status !== 'denied') {
+            item.status = 'complete';
+          }
+        });
+
+        updatedOrder.save();
+      }
+
       return resolve(null);
     }
   );
@@ -113,3 +126,23 @@ export const checkStatusAndCancelItem = params => {
   });
   return promise;
 };
+
+export const checkOrderStatus = (params, status) => {
+  const { promise, resolve, reject } = $q.defer();
+
+  Order.find(params).populate('creator').populate('paymentMethod').exec((err, order) => {
+    if(order.status === 'complete') {
+      return resolve({
+        message: "This order has been already completed.",
+        order: order
+      });
+    } else {
+      return resolve({
+        message: 'Are you sure you want to process payment?',
+        order: order
+      });
+    }
+  });
+
+  return promise;
+}

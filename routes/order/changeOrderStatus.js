@@ -16,6 +16,10 @@ module.exports = {
         type: 'string',
         required: true,
         enum: ['pending', 'active', 'denied', 'complete']
+      },
+      makeInnerChanges: {
+        type: 'boolean',
+        default: false
       }
     }
   },

@@ -20,7 +20,7 @@ const OrderItem = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'preparing', 'active', 'denied', 'complete'],
+    enum: ['pending', 'preparing', 'denied', 'complete'],
     required: true
   },
   notes: {

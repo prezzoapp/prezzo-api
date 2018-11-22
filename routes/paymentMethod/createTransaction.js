@@ -44,13 +44,13 @@ module.exports = {
       }
 
       if(req.body.paymentType && req.body.paymentType === 'cash' && req.body.token === '') {
-        result = await changeOrderStatus(params, 'complete');
+        result = await changeOrderStatus(params, 'complete', true);
       } else {
         result = await createTransaction(
           req.body.token,
           req.body.amount
         );
-        await changeOrderStatus(params, 'complete');
+        await changeOrderStatus(params, 'complete', true);
       }
       res.$end(result);
     } catch (e) {
