@@ -81,7 +81,7 @@ export function changeOrderStatus(params, status, makeInnerChanges) {
 }
 
 export const listOrders = (params, page) => {
-  const limit = 1;
+  const limit = 10;
   const { promise, resolve, reject } = $q.defer();
 
   Order.find(params).skip((page === 0) ? 0 : limit*(page-1)).limit((page === 0) ? 0 : limit).sort({ createdDate: -1 }).populate('creator').populate('paymentMethod').exec((err, orders) => {
@@ -96,7 +96,7 @@ export const listOrders = (params, page) => {
 
 export const checkStatusAndCancelItem = params => {
   const { promise, resolve, reject } = $q.defer();
-  debug("Params: ", params, '');
+  debug('Params: ', params, '');
 
   Order.find({ $and: [params] }).populate('creator').populate('paymentMethod').exec((err, order) => {
     if(err) {
@@ -105,9 +105,29 @@ export const checkStatusAndCancelItem = params => {
     if(order.length !== 0) {
       const itemIndex = order[0].items.findIndex(item => item._id.toString() === params['items._id']);
       if(itemIndex !== -1) {
+        debug('Item Index: ', itemIndex, '');
         order[0].items[itemIndex].status = 'denied';
         order[0].save();
       }
+
+      const isAllItemsCompleted = !order[0].items.some(el => el.status !== 'complete');
+
+      const isAllItemsDenied = !order[0].items.some(el => el.status !== 'denied');
+
+      debug('isAllItemsCompleted', isAllItemsCompleted, '');
+      debug('isAllItemsDenied', isAllItemsDenied, '');
+
+      if(isAllItemsCompleted || isAllItemsDenied) {
+        order[0].status = 'complete';
+        order[0].save();
+
+        return resolve({
+          message: "Your order has been completed.",
+          order: [],
+          finalStatus: 'complete'
+        });
+      }
+
       return resolve({
         message: "Your item has been successfully deleted.",
         order: order
@@ -127,19 +147,27 @@ export const checkStatusAndCancelItem = params => {
   return promise;
 };
 
-export const checkOrderStatus = (params, status) => {
+export const checkOrderStatus = params => {
   const { promise, resolve, reject } = $q.defer();
 
   Order.find(params).populate('creator').populate('paymentMethod').exec((err, order) => {
-    if(order.status === 'complete') {
+    if(order[0].status === 'complete') {
       return resolve({
         message: "This order has been already completed.",
-        order: order
+        order: [],
+        finalStatus: 'complete'
+      });
+    } else if(order[0].status === 'denied') {
+      return resolve({
+        message: "This order has been denied.",
+        order: [],
+        finalStatus: 'denied'
       });
     } else {
       return resolve({
         message: 'Are you sure you want to process payment?',
-        order: order
+        order: order,
+        finalStatus: ''
       });
     }
   });

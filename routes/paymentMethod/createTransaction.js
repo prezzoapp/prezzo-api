@@ -43,7 +43,7 @@ module.exports = {
         params.vendor = req.user.vendor;
       }
 
-      if(req.body.paymentType && req.body.paymentType === 'cash' && req.body.token === '') {
+      if(req.body.token === '') {
         result = await changeOrderStatus(params, 'complete', true);
       } else {
         result = await createTransaction(
