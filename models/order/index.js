@@ -73,7 +73,21 @@ export function changeOrderStatus(params, status, makeInnerChanges) {
         updatedOrder.save();
       }
 
-      return resolve(null);
+      if(updatedOrder.status === 'complete') {
+        return resolve({
+          message: "Your order has been completed.",
+          order: updatedOrder,
+          finalStatus: 'complete'
+        });
+      } else if(updatedOrder.status === 'denied') {
+        return resolve({
+          message: "Your order has been denied.",
+          order: updatedOrder,
+          finalStatus: 'denied'
+        });
+      } else {
+        return resolve(updatedOrder);
+      }
     }
   );
 
@@ -123,7 +137,7 @@ export const checkStatusAndCancelItem = params => {
 
         return resolve({
           message: "Your order has been completed.",
-          order: [],
+          order: order,
           finalStatus: 'complete'
         });
       }
@@ -154,13 +168,13 @@ export const checkOrderStatus = params => {
     if(order[0].status === 'complete') {
       return resolve({
         message: "This order has been already completed.",
-        order: [],
+        order: order,
         finalStatus: 'complete'
       });
     } else if(order[0].status === 'denied') {
       return resolve({
         message: "This order has been denied.",
-        order: [],
+        order: order,
         finalStatus: 'denied'
       });
     } else {

@@ -46,11 +46,11 @@ module.exports = {
       if(req.body.token === '') {
         result = await changeOrderStatus(params, 'complete', true);
       } else {
-        result = await createTransaction(
+        await createTransaction(
           req.body.token,
           req.body.amount
         );
-        await changeOrderStatus(params, 'complete', true);
+        result = await changeOrderStatus(params, 'complete', true);
       }
       res.$end(result);
     } catch (e) {
