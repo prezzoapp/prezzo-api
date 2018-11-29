@@ -28,7 +28,7 @@ module.exports = {
       }
 
       if(req.query && req.query.status) {
-        if(req.query.status === 'pending' || req.query.status === 'preparing' || req.query.status === 'active')
+        if(req.query.status === 'pending')
           params.status = {$in: ['pending', 'preparing', 'active']};
       }
 

@@ -108,55 +108,140 @@ export const listOrders = (params, page) => {
   return promise;
 }
 
+// export const checkStatusAndCancelItem = params => {
+//   const { promise, resolve, reject } = $q.defer();
+//   debug('Params: ', params, '');
+//
+//   Order.find({ $and: [params] }).populate('creator').populate('paymentMethod').exec((err, order) => {
+//     if(err) {
+//       return reject(new ServerError(err));
+//     }
+//     if(order.length !== 0) {
+//       const itemIndex = order[0].items.findIndex(item => item._id.toString() === params['items._id']);
+//       if(itemIndex !== -1) {
+//         debug('Item Index: ', itemIndex, '');
+//         order[0].items[itemIndex].status = 'denied';
+//         order[0].save();
+//       }
+//
+//       const isAllItemsCompleted = !order[0].items.some(el => el.status !== 'complete');
+//
+//       const isAllItemsDenied = !order[0].items.some(el => el.status !== 'denied');
+//
+//       debug('isAllItemsCompleted', isAllItemsCompleted, '');
+//       debug('isAllItemsDenied', isAllItemsDenied, '');
+//
+//       if(isAllItemsCompleted || isAllItemsDenied) {
+//         order[0].status = 'complete';
+//         order[0].save();
+//
+//         return resolve({
+//           message: "Your order has been completed.",
+//           order: order,
+//           finalStatus: 'complete'
+//         });
+//       }
+//
+//       return resolve({
+//         message: "Your item has been successfully deleted.",
+//         order: order
+//       });
+//     }
+//     delete params['items.status'];
+//     Order.find({ $and: [params] }, (err, result) => {
+//       if(err) {
+//         return reject(new ServerError(err))
+//       }
+//       return resolve({
+//         message: "You can't delete this item.",
+//         order: result
+//       });
+//     });
+//   });
+//   return promise;
+// };
+
 export const checkStatusAndCancelItem = params => {
   const { promise, resolve, reject } = $q.defer();
   debug('Params: ', params, '');
 
-  Order.find({ $and: [params] }).populate('creator').populate('paymentMethod').exec((err, order) => {
+  Order.find(params).populate('creator paymentMethod').exec((err, order) => {
     if(err) {
       return reject(new ServerError(err));
     }
     if(order.length !== 0) {
       const itemIndex = order[0].items.findIndex(item => item._id.toString() === params['items._id']);
-      if(itemIndex !== -1) {
-        debug('Item Index: ', itemIndex, '');
+      if(itemIndex !== -1 && order[0].items[itemIndex].status === 'pending') {
         order[0].items[itemIndex].status = 'denied';
         order[0].save();
-      }
 
-      const isAllItemsCompleted = !order[0].items.some(el => el.status !== 'complete');
+        const isAllItemsCompleted = !order[0].items.some(el => el.status !== 'complete');
+        const isAllItemsDenied = !order[0].items.some(el => el.status !== 'denied');
 
-      const isAllItemsDenied = !order[0].items.some(el => el.status !== 'denied');
+        debug('isAllItemsCompleted', isAllItemsCompleted, '');
+        debug('isAllItemsDenied', isAllItemsDenied, '');
 
-      debug('isAllItemsCompleted', isAllItemsCompleted, '');
-      debug('isAllItemsDenied', isAllItemsDenied, '');
+        if(isAllItemsCompleted || isAllItemsDenied) {
+          order[0].status = 'complete';
+          order[0].save();
 
-      if(isAllItemsCompleted || isAllItemsDenied) {
-        order[0].status = 'complete';
-        order[0].save();
-
+          return resolve({
+            message: "Your order has been completed.",
+            order: order,
+            finalStatus: 'complete'
+          });
+        }
         return resolve({
-          message: "Your order has been completed.",
-          order: order,
-          finalStatus: 'complete'
+          message: "Your item has been successfully deleted.",
+          order: order
         });
-      }
-
-      return resolve({
-        message: "Your item has been successfully deleted.",
-        order: order
-      });
-    }
-    delete params['items.status'];
-    Order.find({ $and: [params] }, (err, result) => {
-      if(err) {
-        return reject(new ServerError(err))
       }
       return resolve({
         message: "You can't delete this item.",
-        order: result
+        order: order
       });
-    });
+    }
+    // if(order.length !== 0) {
+    //   const itemIndex = order[0].items.findIndex(item => item._id.toString() === params['items._id']);
+    //   if(itemIndex !== -1) {
+    //     debug('Item Index: ', itemIndex, '');
+    //     order[0].items[itemIndex].status = 'denied';
+    //     order[0].save();
+    //   }
+    //
+    //   const isAllItemsCompleted = !order[0].items.some(el => el.status !== 'complete');
+    //
+    //   const isAllItemsDenied = !order[0].items.some(el => el.status !== 'denied');
+    //
+    //   debug('isAllItemsCompleted', isAllItemsCompleted, '');
+    //   debug('isAllItemsDenied', isAllItemsDenied, '');
+    //
+    //   if(isAllItemsCompleted || isAllItemsDenied) {
+    //     order[0].status = 'complete';
+    //     order[0].save();
+    //
+    //     return resolve({
+    //       message: "Your order has been completed.",
+    //       order: order,
+    //       finalStatus: 'complete'
+    //     });
+    //   }
+    //
+    //   return resolve({
+    //     message: "Your item has been successfully deleted.",
+    //     order: order
+    //   });
+    // }
+    // delete params['items.status'];
+    // Order.find(params, (err, result) => {
+    //   if(err) {
+    //     return reject(new ServerError(err))
+    //   }
+    //   return resolve({
+    //     message: "You can't delete this item.",
+    //     order: result
+    //   });
+    // });
   });
   return promise;
 };

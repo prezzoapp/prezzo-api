@@ -30,7 +30,7 @@ module.exports = {
       params['items._id'] = req.params.itemid;
     }
 
-    params['items.status'] = 'pending';
+    // params['items.status'] = 'pending';
 
     try {
       const order = await checkStatusAndCancelItem(params);
