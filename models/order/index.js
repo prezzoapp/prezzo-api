@@ -73,21 +73,27 @@ export function changeOrderStatus(params, status, makeInnerChanges) {
         updatedOrder.save();
       }
 
-      if(updatedOrder.status === 'complete') {
-        return resolve({
-          message: "Your order has been completed.",
-          order: updatedOrder,
-          finalStatus: 'complete'
-        });
-      } else if(updatedOrder.status === 'denied') {
-        return resolve({
-          message: "Your order has been denied.",
-          order: updatedOrder,
-          finalStatus: 'denied'
-        });
-      } else {
-        return resolve(updatedOrder);
-      }
+      return resolve(updatedOrder);
+
+      // if(updatedOrder.status === 'complete') {
+      //   return resolve({
+      //     message: "Your order has been completed.",
+      //     order: updatedOrder,
+      //     finalStatus: 'complete'
+      //   });
+      // } else if(updatedOrder.status === 'denied') {
+      //   return resolve({
+      //     message: "Your order has been denied.",
+      //     order: updatedOrder,
+      //     finalStatus: 'denied'
+      //   });
+      // } else {
+      //   return resolve({
+      //     message: "",
+      //     order: updatedOrder,
+      //     finalStatus: updatedOrder
+      //   });
+      // }
     }
   );
 
@@ -185,21 +191,11 @@ export const checkStatusAndCancelItem = params => {
           order[0].status = 'complete';
           order[0].save();
 
-          return resolve({
-            message: "Your order has been completed.",
-            order: order,
-            finalStatus: 'complete'
-          });
+          return resolve(order);
         }
-        return resolve({
-          message: "Your item has been successfully deleted.",
-          order: order
-        });
+        return resolve(order);
       }
-      return resolve({
-        message: "You can't delete this item.",
-        order: order
-      });
+      return resolve(order);
     }
     // if(order.length !== 0) {
     //   const itemIndex = order[0].items.findIndex(item => item._id.toString() === params['items._id']);
@@ -249,26 +245,27 @@ export const checkStatusAndCancelItem = params => {
 export const checkOrderStatus = params => {
   const { promise, resolve, reject } = $q.defer();
 
-  Order.find(params).populate('creator').populate('paymentMethod').exec((err, order) => {
-    if(order[0].status === 'complete') {
-      return resolve({
-        message: "This order has been already completed.",
-        order: order,
-        finalStatus: 'complete'
-      });
-    } else if(order[0].status === 'denied') {
-      return resolve({
-        message: "This order has been denied.",
-        order: order,
-        finalStatus: 'denied'
-      });
-    } else {
-      return resolve({
-        message: 'Are you sure you want to process payment?',
-        order: order,
-        finalStatus: ''
-      });
-    }
+  Order.find(params).populate('creator paymentMethod').exec((err, order) => {
+    return resolve(order);
+    // if(order[0].status === 'complete') {
+    //   return resolve({
+    //     message: "This order has been already completed.",
+    //     order: order,
+    //     finalStatus: 'complete'
+    //   });
+    // } else if(order[0].status === 'denied') {
+    //   return resolve({
+    //     message: "This order has been already denied.",
+    //     order: order,
+    //     finalStatus: 'denied'
+    //   });
+    // } else {
+    //   return resolve({
+    //     message: '',
+    //     order: order,
+    //     finalStatus: ''
+    //   });
+    // }
   });
 
   return promise;

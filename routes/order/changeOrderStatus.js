@@ -49,9 +49,9 @@ module.exports = {
     }
 
     try {
-      await changeOrderStatus(params, req.body.status);
+      const updatedOrder = await changeOrderStatus(params, req.body.status);
 
-      res.$end();
+      res.$end(updatedOrder);
     } catch (e) {
       warn('Failed to create order.', e);
       res.$fail(e);
