@@ -23,10 +23,10 @@ export const createOrder = params => {
   ).save();
 };
 
-export const checkPendingOrders = (user, orderStatus) => {
-  if(orderStatus === 'denied' || orderStatus === 'complete') {
-    return Promise.resolve(null);
-  }
+export const checkPendingOrders = user => {
+  // if(orderStatus === 'denied' || orderStatus === 'complete') {
+  //   return Promise.resolve(null);
+  // }
 
   return Order.findOne({
     $and: [
@@ -42,60 +42,85 @@ export const checkPendingOrders = (user, orderStatus) => {
   });
 };
 
-export function changeOrderStatus(params, status, makeInnerChanges) {
+export function changeOrderStatus(params, status, changeInnerItemsStatus) {
   const { promise, resolve, reject } = $q.defer();
 
-  Order.findOneAndUpdate(
-    { $and: [params] },
-    {
-      $set: {
-        status
-      }
-    },
-    {
-      new: true
-    }, (err, updatedOrder) => {
-      if (err) {
-        return reject(new Error("error while updating!"));
-      } else if (!updatedOrder) {
-        return reject(new Error('no updated order found'));
-      }
-
-      if(makeInnerChanges) {
-        updatedOrder.items.map(item => {
-          if(item.status === 'pending') {
-            item.status = 'denied';
-          } else if(item.status !== 'pending' && item.status !== 'denied') {
-            item.status = 'complete';
-          }
-        });
-
-        updatedOrder.save();
-      }
-
-      return resolve(updatedOrder);
-
-      // if(updatedOrder.status === 'complete') {
-      //   return resolve({
-      //     message: "Your order has been completed.",
-      //     order: updatedOrder,
-      //     finalStatus: 'complete'
-      //   });
-      // } else if(updatedOrder.status === 'denied') {
-      //   return resolve({
-      //     message: "Your order has been denied.",
-      //     order: updatedOrder,
-      //     finalStatus: 'denied'
-      //   });
-      // } else {
-      //   return resolve({
-      //     message: "",
-      //     order: updatedOrder,
-      //     finalStatus: updatedOrder
-      //   });
-      // }
+  Order.findOne({ $and: [params] }).populate('creator paymentMethod').exec((err, order) => {
+    if(err) {
+      return reject(new ServerError(err));
     }
-  );
+
+    if(!order) {
+      return resolve({ res_code: 204, res_message: 'Not found!', response: order });
+    }
+
+    if(changeInnerItemsStatus) {
+      order.items.map(item => {
+        if(item.status === 'pending') {
+          item.status = 'denied';
+        } else if(item.status !== 'pending' && item.status !== 'denied') {
+          item.status = 'complete';
+        }
+      });
+
+      order.save();
+    }
+
+    if(
+      (status === 'active' && order.status === 'active') ||
+      (status === 'denied' && order.status === 'active')
+    ) {
+      return resolve({ res_code: 206, res_message: 'Already activated!', response: order });
+    } else if(
+        (status === 'active' && order.status === 'denied') ||
+        (status === 'denied' && order.status === 'denied') ||
+        (status === 'complete' && order.status === 'denied')
+      ) {
+      return resolve({ res_code: 206, res_message: 'Already denied!', response: order });
+    } else if(
+        (status === 'active' && order.status === 'complete') ||
+        (status === 'denied' && order.status === 'complete') ||
+        (status === 'complete' && order.status === 'complete')
+      ) {
+      return resolve({ res_code: 206, res_message: 'Already completed!', response: order });
+    } else {
+      order.status = status;
+      order.save();
+      return resolve({ res_code: 200, res_message: 'Success!', response: order });
+    }
+  });
+
+  // Order.findOneAndUpdate(
+  //   { $and: [params] },
+  //   {
+  //     $set: {
+  //       status
+  //     }
+  //   },
+  //   {
+  //     new: true
+  //   }, (err, updatedOrder) => {
+  //     if (err) {
+  //       return reject(new Error("error while updating!"));
+  //     } else if (!updatedOrder) {
+  //       return reject(new Error('no updated order found'));
+  //     }
+  //
+  //     if(makeInnerChanges) {
+  //       updatedOrder.items.map(item => {
+  //         if(item.status === 'pending') {
+  //           item.status = 'denied';
+  //         } else if(item.status !== 'pending' && item.status !== 'denied') {
+  //           item.status = 'complete';
+  //         }
+  //       });
+  //
+  //       updatedOrder.save();
+  //     }
+  //
+  //     return resolve(updatedOrder);
+  //   }
+  // );
 
   return promise;
 }
@@ -108,7 +133,10 @@ export const listOrders = (params, page) => {
     if(err) {
       return reject(new ServerError(err));
     }
-    return resolve(orders);
+    if(orders.length === 0) {
+      return resolve({ res_code: 204, res_message: 'No items found!', response: orders });
+    }
+    return resolve({ res_code: 200, res_message: '', response: orders });
   });
 
   return promise;
@@ -242,11 +270,22 @@ export const checkStatusAndCancelItem = params => {
   return promise;
 };
 
-export const checkOrderStatus = params => {
+export const checkOrderStatus = (params, status) => {
   const { promise, resolve, reject } = $q.defer();
 
   Order.find(params).populate('creator paymentMethod').exec((err, order) => {
-    return resolve(order);
+    if(err) {
+      return reject(new ServerError(err));
+    }
+    if(order.length === 0) {
+      return resolve({ res_code: 204, res_message: 'No item found!', response: order });
+    }
+    if(status === 'complete' && order[0].status === 'complete') {
+      return resolve({ res_code: 206, res_message: 'Already completed!', response: order });
+    } else if(status === 'complete' && order[0].status === 'denied') {
+      return resolve({ res_code: 206, res_message: 'Already denied!', response: order });
+    }
+    return resolve({ res_code: 200, res_message: '', response: order });
     // if(order[0].status === 'complete') {
     //   return resolve({
     //     message: "This order has been already completed.",

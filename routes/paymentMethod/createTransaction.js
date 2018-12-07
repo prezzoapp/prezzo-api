@@ -52,7 +52,10 @@ module.exports = {
         );
         result = await changeOrderStatus(params, 'complete', true);
       }
-      res.$end(result);
+
+      const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
+      res.set(picked);
+      res.$end(result.response);
     } catch (e) {
       warn('Failed to make transaction.', e);
       res.$fail(new ServerError(e));

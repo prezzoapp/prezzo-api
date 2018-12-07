@@ -42,10 +42,12 @@ module.exports = {
         page = parseInt(req.query.page);
       }
 
-      const orders = await listOrders(params, page);
-      res.$end(orders);
+      const result = await listOrders(params, page);
+      const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
+      res.set(picked);
+      res.$end(result.response);
     } catch (e) {
-      warn('Failed to create order.', e);
+      warn('Server error while fetching orders.', e);
       res.$fail(new ServerError(e));
     }
   }

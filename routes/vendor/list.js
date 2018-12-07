@@ -72,6 +72,10 @@ module.exports = {
 
       const vendors = await listVendors(params);
 
+      res.set({
+        res_code: 200,
+        res_message: 'List Vendors Success!'
+      });
       res.$end(vendors);
     } catch (e) {
       return res.$fail(new ServerError(e));

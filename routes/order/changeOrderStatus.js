@@ -17,7 +17,7 @@ module.exports = {
         required: true,
         enum: ['pending', 'active', 'denied', 'complete']
       },
-      makeInnerChanges: {
+      changeInnerItemsStatus: {
         type: 'boolean',
         default: false
       }
@@ -49,11 +49,13 @@ module.exports = {
     }
 
     try {
-      const updatedOrder = await changeOrderStatus(params, req.body.status);
+      const result = await changeOrderStatus(params, req.body.status, req.body.changeInnerItemsStatus);
 
-      res.$end(updatedOrder);
+      const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
+      res.set(picked);
+      res.$end(result.response);
     } catch (e) {
-      warn('Failed to create order.', e);
+      warn('Failed to Change Order Status.', e);
       res.$fail(e);
     }
   }

@@ -1,7 +1,7 @@
 // @flow
 import type { $Request, $Response } from 'express';
 import { isObjectId, extend } from 'alfred/services/util';
-import { ForbiddenError } from 'alfred/core/errors';
+import { ForbiddenError, PermissionDeniedError } from 'alfred/core/errors';
 import { debug, warn } from 'alfred/services/logger';
 import $q from 'q';
 import { createOrder, checkPendingOrders } from '../../models/order';
@@ -51,11 +51,10 @@ module.exports = {
     req => {
       const { promise, resolve, reject } = $q.defer();
       const { user } = req;
-      const { status } = req.body;
 
-      checkPendingOrders(user, status).then(result => {
+      checkPendingOrders(user).then(result => {
         if (result) {
-          reject(new ForbiddenError('You already have an open order.'));
+          reject(new PermissionDeniedError('You already have an open order.'));
         }
         resolve();
       });

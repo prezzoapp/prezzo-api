@@ -32,10 +32,10 @@ module.exports = {
           params.status = {$in: ['pending', 'preparing', 'active']};
       }
 
-      debug("Params: ", params, '');
-
-      const orders = await listOrders(params);
-      res.$end(orders);
+      const result = await listOrders(params);
+      const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
+      res.set(picked);
+      res.$end(result.response);
     } catch (e) {
       warn('Failed to create order.', e);
       res.$fail(new ServerError(e));

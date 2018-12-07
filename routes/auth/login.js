@@ -46,6 +46,10 @@ module.exports = {
       const { type, pushToken } = req.body;
       const user = await req.data.user.startSession(type, pushToken);
 
+      res.set({
+          res_code: 200,
+          res_message: 'Success'
+      });
       res.$end(user.toObject());
     } catch (e) {
       log.warn('Failed to login.', e);
