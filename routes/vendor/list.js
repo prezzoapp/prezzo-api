@@ -26,13 +26,15 @@ module.exports = {
         type: 'string'
       },
       pricing: {
-        type: 'string'
+        type: 'string',
+        enum: ['1', '2', '3', '4']
       }
     }
   },
   async run(req: $Request, res: $Response) {
     try {
       const params = {};
+      const currentDayAndHour = {};
       const { name, distance, longitude, latitude, activeFilters, pricing } = req.query;
 
       if (name) {
@@ -64,13 +66,18 @@ module.exports = {
             params.pricing = parseInt(pricing);
             break;
           }
+          if(array[index] === 'openNow') {
+            const date = new Date();
+            currentDayAndHour.day = date.getDay();
+            currentDayAndHour.hour = date.getHours();
+          }
         }
         params.filters = { $all: array };
       }
 
       debug('Params: ', params, '');
 
-      const vendors = await listVendors(params);
+      const vendors = await listVendors(params, currentDayAndHour);
 
       res.set({
         res_code: 200,

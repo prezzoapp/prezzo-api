@@ -129,7 +129,7 @@ export const listOrders = (params, page) => {
   const limit = 10;
   const { promise, resolve, reject } = $q.defer();
 
-  Order.find(params).skip((page === 0) ? 0 : limit*(page-1)).limit((page === 0) ? 0 : limit).sort({ createdDate: -1 }).populate('creator').populate('paymentMethod').exec((err, orders) => {
+  Order.find(params).skip((page === 0) ? 0 : limit*(page-1)).limit((page === 0) ? 0 : limit).sort({ createdDate: -1 }).populate('creator paymentMethod').exec((err, orders) => {
     if(err) {
       return reject(new ServerError(err));
     }

@@ -2,7 +2,7 @@
 import type { $Request, $Response } from 'express';
 import { isValidEmail } from 'alfred/services/util';
 import { ServerError } from 'alfred/core/errors';
-import log from 'alfred/services/logger';
+import { debug, log } from 'alfred/services/logger';
 import { findUserByEmail } from '../../models/user';
 
 module.exports = {

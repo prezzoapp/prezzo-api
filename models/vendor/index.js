@@ -84,7 +84,7 @@ export const updateVendor = (vendorId, params) => {
   return promise;
 };
 
-export const listVendors = (params: any) => {
+export const listVendors = (params: any, currentDayAndHour: any) => {
   const { promise, resolve, reject } = $q.defer();
 
   Vendor.find(params)
@@ -92,6 +92,28 @@ export const listVendors = (params: any) => {
     .exec((err, vendors) => {
       if (err) {
         return reject(new ServerError(err));
+      }
+
+      if(vendors.length !== 0) {
+        console.log(currentDayAndHour);
+        if(currentDayAndHour !== {}) {
+          console.log("Enter");
+          for(let i = 0; i < vendors.length; i++) {
+            for(let j = 0; j < vendors[i].hours.length; j++) {
+              if(vendors[i].hours[j].dayOfWeek === currentDayAndHour.day &&
+                currentDayAndHour.hour >= vendors[i].hours[j].openTimeHour &&
+                currentDayAndHour.hour <= vendors[i].hours[j].closeTimeHour
+              ) {
+                console.log("Found!!!");
+              }
+            }
+          }
+
+          // console.log(newVendors);
+          //
+          // return resolve(newVendors);
+        }
+        return resolve(vendors);
       }
 
       return resolve(vendors);
