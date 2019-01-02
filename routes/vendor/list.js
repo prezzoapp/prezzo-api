@@ -62,20 +62,32 @@ module.exports = {
       if(activeFilters && activeFilters !== '') {
         const array = activeFilters.split(',');
         for(let index in array) {
-          if(array[index] === 'price' && pricing) {
-            params.pricing = parseInt(pricing);
-            break;
-          }
           if(array[index] === 'openNow') {
             const date = new Date();
-            currentDayAndHour.day = date.getDay();
-            currentDayAndHour.hour = date.getHours();
+            params['hours'] = {
+              $elemMatch: {
+                dayOfWeek: date.getDay(),
+                openTimeHour: { $lte: date.getHours() },
+                closeTimeHour: { $gte: date.getHours() }
+              }
+            };
+            const index = array.indexOf('openNow');
+            console.log(index);
+            if(index !== -1) {
+              array.splice(index, 1);
+            }
+            console.log(array);
+          }
+          if(array[index] === 'price' && pricing) {
+            params.pricing = parseInt(pricing);
           }
         }
-        params.filters = { $all: array };
+        if(array.length !== 0) {
+          params.filters = { $all: array };
+        }
       }
 
-      debug('Params: ', params, '');
+      // debug('Params: ', JSON.stringify(params), '');
 
       const vendors = await listVendors(params, currentDayAndHour);
 
