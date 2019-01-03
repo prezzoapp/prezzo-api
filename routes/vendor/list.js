@@ -68,7 +68,7 @@ module.exports = {
               $elemMatch: {
                 dayOfWeek: date.getDay(),
                 openTimeHour: { $lte: date.getHours() },
-                closeTimeHour: { $gte: date.getHours() }
+                closeTimeHour: { $gt: date.getHours() }
               }
             };
             const index = array.indexOf('openNow');
