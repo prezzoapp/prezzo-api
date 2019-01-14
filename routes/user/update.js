@@ -41,6 +41,12 @@ module.exports = {
       city: {
         type: 'string',
         trim: true
+      },
+      deviceId: {
+        type: 'string'
+      },
+      newDeviceId: {
+        type: 'string'
       }
     }
   },
@@ -59,7 +65,25 @@ module.exports = {
   },
   async run(req: $Request, res: $Response) {
     try {
-      const user = await findAndUpdateUser({ _id: req.params.id }, req.body);
+      const query = {
+        _id: req.params.id
+      };
+      const updateQuery = {};
+      if (req.body.deviceId) {
+        query.deviceId = req.body.deviceId;
+        delete req.body.deviceId;
+        const newDeviceId = req.body.newDeviceId;
+        delete req.body.newDeviceId;
+        updateQuery.$set = Object.assign(
+          {
+            'deviceId.$': newDeviceId
+          },
+          req.body
+        );
+      } else {
+        updateQuery.$set = Object.assign(req.body);
+      }
+      const user = await findAndUpdateUser(query, updateQuery);
       res.$end(user);
     } catch (e) {
       log.warn('Failed to update user.', e);

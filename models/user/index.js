@@ -8,6 +8,30 @@ const User = require('../../services/mongo').registerModel(__dirname, 'User');
 export default User;
 
 export const createUser = async (params: any = {}) => new User(params).save();
+/**
+ * Returns an Array of distinct values of the field passed.
+ * @param  {String} field -The field whose distinct values are to be find.
+ * @param  {Object={}} filter -Filter for the query on whose distinct value is to be find.
+ */
+export const getDistinctUserFields = async (
+  field: string,
+  filter: object = {}
+) => {
+  const { promise, resolve, reject } = $q.defer();
+  User.distinct(field, filter, (err, res) => {
+    if (err) {
+      return reject(new ServerError(err));
+    } else if (!res.length) {
+      return reject(
+        new ResourceNotFoundError('No value exists for the field.')
+      );
+    }
+
+    return resolve(res);
+  });
+
+  return promise;
+};
 
 export const findUserByEmail = (email: string) => {
   const { promise, resolve, reject } = $q.defer();

@@ -71,6 +71,10 @@ const User = new mongoose.Schema({
   vendor: {
     type: ObjectId,
     ref: 'Vendor'
+  },
+  deviceId: {
+    type: ['string'],
+    default: []
   }
 });
 
