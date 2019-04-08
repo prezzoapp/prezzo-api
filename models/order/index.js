@@ -125,19 +125,33 @@ export function changeOrderStatus(params, status, changeInnerItemsStatus) {
   return promise;
 }
 
-export const listOrders = (params, page) => {
+export const listOrders = (params) => {
   const limit = 10;
   const { promise, resolve, reject } = $q.defer();
 
-  Order.find(params).skip((page === 0) ? 0 : limit*(page-1)).limit((page === 0) ? 0 : limit).sort({ createdDate: -1 }).populate('creator paymentMethod').exec((err, orders) => {
+  debug('Params: ', params);
+
+  Order.find(params).limit(limit).sort({ createdDate: -1 }).populate('creator paymentMethod').exec((err, orders) => {
     if(err) {
       return reject(new ServerError(err));
     }
+
     if(orders.length === 0) {
       return resolve({ res_code: 204, res_message: 'No items found!', response: orders });
     }
+
     return resolve({ res_code: 200, res_message: '', response: orders });
   });
+
+  // Order.find(params).skip((page === 0) ? 0 : limit*(page-1)).limit((page === 0) ? 0 : limit).sort({ createdDate: -1 }).populate('creator paymentMethod').exec((err, orders) => {
+  //   if(err) {
+  //     return reject(new ServerError(err));
+  //   }
+  //   if(orders.length === 0) {
+  //     return resolve({ res_code: 204, res_message: 'No items found!', response: orders });
+  //   }
+  //   return resolve({ res_code: 200, res_message: '', response: orders });
+  // });
 
   return promise;
 }

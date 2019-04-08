@@ -19,7 +19,7 @@ module.exports = {
         type: 'string',
         enum: STATUSES
       },
-      page: {
+      lastId: {
         type: 'string'
       }
     }
@@ -27,8 +27,6 @@ module.exports = {
   async run(req: $Request, res: $Response) {
     try {
       const params = { vendor: req.params.id };
-
-      let page = 0;
 
       if (req.query && req.query.type) {
         params.type = req.query.type;
@@ -38,11 +36,11 @@ module.exports = {
         params.status = req.query.status;
       }
 
-      if(req.query && req.query.page) {
-        page = parseInt(req.query.page);
+      if(req.query && req.query.lastId) {
+        params._id = { $lt: req.query.lastId };
       }
 
-      const result = await listOrders(params, page);
+      const result = await listOrders(params);
       const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
       res.set(picked);
       res.$end(result.response);
