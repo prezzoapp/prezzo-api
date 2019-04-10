@@ -51,6 +51,8 @@ module.exports = {
     try {
       const result = await changeOrderStatus(params, req.body.status, req.body.changeInnerItemsStatus);
 
+      debug('RESULT:', result, '');
+
       const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
       res.set(picked);
       res.$end(result.response);
