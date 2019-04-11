@@ -54,7 +54,7 @@ module.exports = {
 
       checkPendingOrders(user).then(result => {
         if (result) {
-          reject(new PermissionDeniedError('You already have an open order at another restaurant.'));
+          reject(new ForbiddenError('You already have an open order at another restaurant.'));
         }
         resolve();
       });
