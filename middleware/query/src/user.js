@@ -19,8 +19,6 @@ module.exports = {
     User.findOne(query, (err, user) => {
       if (err) {
         return res.$fail(new ServerError(err));
-      } else if (!user) {
-        return res.$fail(new ResourceNotFoundError("That user doesn't exist."));
       }
 
       req.data.user = user;

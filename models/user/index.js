@@ -53,7 +53,7 @@ export const findAndUpdateUser = (query: any = {}, update: any = {}) => {
       console.log(err);
       return reject(new ServerError(err));
     } else if (!user) {
-      return reject(new ResourceNotFoundError('That user doesnt exist.'));
+      return reject(new ResourceNotFoundError("That user doesn't exist."));
     }
 
     return resolve(user);
