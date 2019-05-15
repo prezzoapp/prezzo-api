@@ -44,9 +44,9 @@ module.exports = {
     if(req.params && req.params.id) {
       params._id = req.params.id;
     }
-    if(req.user && req.user.vendor) {
-      params.vendor = req.user.vendor;
-    }
+    // if(req.user && req.user.vendor) {
+    //   params.vendor = req.user.vendor;
+    // }
 
     try {
       const result = await changeOrderStatus(params, req.body.status, req.body.changeInnerItemsStatus);

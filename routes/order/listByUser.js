@@ -16,6 +16,9 @@ module.exports = {
       },
       status: {
         type: 'string'
+      },
+      userType: {
+        type: 'string'
       }
     }
   },
@@ -28,11 +31,14 @@ module.exports = {
       }
 
       if(req.query && req.query.status) {
-        if(req.query.status === 'pending')
+        if(req.query.status === 'pending') {
           params.status = {$in: ['pending', 'preparing', 'active']};
+        } else if(req.query.status === 'complete') {
+          params.status = {$in: ['complete']}
+        }
       }
 
-      const result = await listOrders(params);
+      const result = await listOrders(params, req.query.userType);
       const picked = (({ res_code, res_message }) => ({ res_code, res_message }))(result);
       res.set(picked);
       res.$end(result.response);

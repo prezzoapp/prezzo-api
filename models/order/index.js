@@ -72,15 +72,18 @@ function changeOrderStatusCommon(status, order) {
 
 export function changeOrderStatus(params, status, changeInnerItemsStatus) {
   const { promise, resolve, reject } = $q.defer();
+  debug('Params: ', params);
 
   Order.findOne({ $and: [params] }).populate('creator paymentMethod').exec((err, order) => {
     if(err) {
-      reject(new ServerError(err));
+      return reject(new ServerError(err));
     }
 
-    if(!order) {
-      resolve({ res_code: 204, res_message: 'Not found!', response: order });
+    if(order) {
+      return reject(new ResourceNotFoundError('Order not found.'));
     }
+
+    debug('Order: ', order, '');
 
     if(changeInnerItemsStatus) {
       order.items.map(item => {
@@ -92,25 +95,27 @@ export function changeOrderStatus(params, status, changeInnerItemsStatus) {
       });
 
       order.save().then(() => {
-        resolve(changeOrderStatusCommon(status, order));
+        return resolve(changeOrderStatusCommon(status, order));
       })
       .catch(err => {
-        reject(new ServerError(err));
+        return reject(new ServerError(err));
       });
     } else {
-      resolve(changeOrderStatusCommon(status, order));
+      return resolve(changeOrderStatusCommon(status, order));
     }
   });
   return promise;
 };
 
-export const listOrders = (params) => {
+export const listOrders = (params, userType = 'vendor') => {
+  debug('Customer Type: ', userType);
   const limit = 10;
   const { promise, resolve, reject } = $q.defer();
+  const query = userType === 'customer'
+  ? Order.find(params).populate('creator paymentMethod vendor')
+  : Order.find(params).limit(limit).sort({ createdDate: -1 }).populate('creator paymentMethod vendor')
 
-  debug('Params: ', params);
-
-  Order.find(params).limit(limit).sort({ createdDate: -1 }).populate('creator paymentMethod').exec((err, orders) => {
+  query.exec((err, orders) => {
     if(err) {
       return reject(new ServerError(err));
     }

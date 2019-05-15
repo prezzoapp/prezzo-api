@@ -39,9 +39,11 @@ module.exports = {
       if(req.body && req.body.order) {
         params._id = req.body.order;
       }
-      if(req.user && req.user.vendor) {
-        params.vendor = req.user.vendor;
-      }
+      // if(req.body && req.body.vendor) {
+      //   params.vendor = req.body.vendor;
+      // }
+
+      // debug('Vendor: ', req.body.vendor, '');
 
       if(req.body.token === '') {
         result = await changeOrderStatus(params, 'complete', true);

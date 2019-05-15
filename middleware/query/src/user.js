@@ -1,6 +1,7 @@
 // @flow
 import { ServerError, ResourceNotFoundError } from 'alfred/core/errors';
 import { isObjectId } from 'alfred/services/util';
+import { debug } from 'alfred/services/logger';
 import User from '../../../models/user';
 
 module.exports = {
@@ -9,6 +10,7 @@ module.exports = {
   priority: 2,
   match: '/v1/users/:id/',
   run(req, res, next) {
+    debug('hit user query middleware');
     const { id } = req.params;
     const query = isObjectId(id)
       ? { _id: id }
