@@ -79,7 +79,7 @@ export function changeOrderStatus(params, status, changeInnerItemsStatus) {
       return reject(new ServerError(err));
     }
 
-    if(order) {
+    if(!order) {
       return reject(new ResourceNotFoundError('Order not found.'));
     }
 

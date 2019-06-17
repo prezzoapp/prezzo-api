@@ -22,7 +22,7 @@ const PaymentMethod = new mongoose.Schema({
       'braintree-paypal',
       'braintree-visa',
       'braintree-mastercard',
-      'braintree-amex',
+      'braintree-american express',
       'braintree-discover',
       'braintree-jcb',
       'braintree-diners',
