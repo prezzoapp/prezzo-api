@@ -1,8 +1,17 @@
 // @flow
-import type { $Request, $Response } from 'express';
-import { debug } from 'alfred/services/logger';
-import { ServerError } from 'alfred/core/errors';
-import { listVendors } from '../../models/vendor';
+import type, {
+  $Request,
+  $Response
+} from 'express';
+import {
+  debug
+} from 'alfred/services/logger';
+import {
+  ServerError
+} from 'alfred/core/errors';
+import {
+  listVendors
+} from '../../models/vendor';
 
 module.exports = {
   description: 'List all vendors.',
@@ -33,63 +42,139 @@ module.exports = {
   },
   async run(req: $Request, res: $Response) {
     try {
-      const params = {};
-      const currentDayAndHour = {};
-      const { name, distance, longitude, latitude, activeFilters, pricing } = req.query;
+      const {
+        name,
+        distance,
+        longitude,
+        latitude,
+        activeFilters,
+        pricing
+      } = req.query;
+      const aggQuery = [];
 
+      if (latitude && longitude) {
+        const geo = {
+          $geoNear: {
+            near: {
+              type: 'point',
+              coordinates: [parseFloat(latitude), parseFloat(longitude)]
+            },
+            maxDistance: distance || 50 * 1.60934 * 1000,
+            spherical: true
+          }
+        };
+        aggQuery.push(geo);
+      }
+
+      const lookUp = {
+        $lookup: {
+          from: 'menus',
+          localField: 'menu',
+          foreignField: '_id',
+          as: 'menu'
+        }
+      };
+      aggQuery.push(lookUp);
+     const matchQuery = {
+        $match: {}
+      };
       if (name) {
-        params.name = {
-          $regex: new RegExp(name.toLowerCase()),
+        matchQuery.$match.name = {
+          $regex: name,
           $options: 'i'
         };
       }
-
-      if (longitude && latitude) {
-        const coordinates = [longitude, latitude];
-        const maxDistance = parseInt(distance || (50 * 1.60934 * 1000));
-
-        params['location.coordinates'] = {
-          $near: {
-            $geometry: {
-              type: 'Point',
-              coordinates
+      const activeFiltersArray =
+        activeFilters === '' || !activeFilters
+          ? false
+          : activeFilters.split(',');
+      if (activeFiltersArray && activeFiltersArray.indexOf('openNow') !== -1) {
+        matchQuery.$match.hours = {
+          $elemMatch: {
+            dayOfWeek: {
+              $eq: new Date().getDay()
             },
-            $maxDistance: maxDistance
+            $or: [
+              {
+                openTimeHour: {
+                  $lte: new Date().getHours()
+                }
+              },
+              {
+                $and: [
+                  {
+                    openTimeHour: {
+                      $eq: new Date().getHours()
+                    }
+                  },
+                  {
+                    openTimeMinutes: {
+                      $gt: new Date().getMinutes()
+                    }
+                  }
+                ]
+              }
+            ],
+            $or: [
+              {
+                closeTimeHour: {
+                  $gt: new Date().getHours()
+                }
+              },
+              {
+                $and: [
+                  {
+                    closeTimeHour: {
+                      $eq: new Date().getHours()
+                    }
+                  },
+                  {
+                    closeTimeMinutes: {
+                      $gt: new Date().getMinutes()
+                    }
+                  }
+                ]
+              }
+            ]
           }
         };
       }
 
-      if(activeFilters && activeFilters !== '') {
-        const array = activeFilters.split(',');
-        for(let index in array) {
-          if(array[index] === 'openNow') {
-            const date = new Date();
-            params['hours'] = {
-              $elemMatch: {
-                dayOfWeek: date.getDay(),
-                openTimeHour: { $lte: date.getHours() },
-                closeTimeHour: { $gt: date.getHours() }
-              }
-            };
-            const index = array.indexOf('openNow');
-            console.log(index);
-            if(index !== -1) {
-              array.splice(index, 1);
-            }
-            console.log(array);
-          }
-          if(array[index] === 'price' && pricing) {
-            params.pricing = parseInt(pricing);
-          }
-        }
-        if(array.length !== 0) {
-          params.filters = { $all: array };
-        }
+      if (
+        activeFiltersArray &&
+        activeFiltersArray.indexOf('price') !== -1 &&
+        pricing
+      ) {
+        matchQuery.$match.pricing = parseInt(pricing, 10);
       }
+      aggQuery.push(matchQuery);
+      aggQuery.push({
+        $unwind: '$menu'
+      });
+      // if (longitude && latitude) {
+      //   const coordinates = [longitude, latitude];
+      //   const maxDistance = parseInt(distance || (50 * 1.60934 * 1000));
 
-      // debug('Params: ', JSON.stringify(params), '');
+      //   params['location.coordinates'] = {
+      //     $near: {
+      //       $geometry: {
+      //         type: 'Point',
+      //         coordinates
+      //       },
+      //       $maxDistance: maxDistance
+      //     }
+      //   };
+      // }
 
-      const vendors = await listVendors(params, currentDayAndHour);
+      // if (activeFilters && activeFilters !== '') {
+      //   // need more clarity
+      //   // if (array.length !== 0) {
+      //   //   params.filters = {
+      //   //     $all: array
+      //   //   };
+      //   // }
+      // }
+      const vendors = await listVendors(aggQuery);
 
       res.set({
         res_code: 200,
